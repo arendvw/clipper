@@ -7,6 +7,8 @@ using Rhino;
 using Rhino.Geometry;
 using ClipperLib;
 
+/// This file contains the glue to connect the Clipper library to RhinoCommon
+/// It depends only on rhinoCommon and the clipper library (included)
 namespace StudioAvw.Geometry {
 
   public static class PolyNodeHelper {

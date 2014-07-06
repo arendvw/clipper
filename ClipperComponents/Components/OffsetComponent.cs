@@ -28,6 +28,7 @@ namespace StudioAvw.Clipper.Components {
     /// Registers all the input parameters for this component.
     /// </summary>
     protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager) {
+      // set the message for this component.
       pManager.AddCurveParameter("Polylines", "P", "A list of polylines to offset", GH_ParamAccess.list);
       pManager.AddNumberParameter("Distance", "D", "Offset Distance", GH_ParamAccess.item);
       pManager.AddPlaneParameter("Plane", "Pln", "Plane to project the polylines to", GH_ParamAccess.item, default(Plane));
@@ -74,11 +75,11 @@ namespace StudioAvw.Clipper.Components {
         pln = polylines.First().FitPlane();
       }
 
+      // set default fillet type.
       if (closedType == null || closedType.Count == 0) {
         closedType = new List<Polyline3D.ClosedFilletType> { Polyline3D.ClosedFilletType.Square };
       }
 
-      // SCRIPTCODE (may need adaptation)
       if (curves.Count == 0) {
         return;
       }
@@ -86,7 +87,6 @@ namespace StudioAvw.Clipper.Components {
       List<List<Polyline>> outside;
       List<List<Polyline>> holes;
       Polyline3D.Offset(polylines, openType, closedType, pln, tolerance, new List<double> { dist }, miter, 0.25, out outside, out holes);
-      // END OF SCRIPTCODE
 
 
       // OUTPUT LOGIC
@@ -95,8 +95,6 @@ namespace StudioAvw.Clipper.Components {
     }
 
     /// ADDITIONAL CODE
-
-
 
     /// <summary>
     /// Provides an Icon for the component.
