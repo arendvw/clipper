@@ -21,7 +21,7 @@ namespace StudioAvw.Clipper.Components {
     /// Initializes a new instance of the C# ScriptComponent class.
     /// </summary>
     public ClipperOffsetComponent()
-      : base("Polygon Offset", "PolyOffset", "Offset a polygon curve", "Studioavw", "Polygon") {
+      : base("Polyline Offset", "PolyOffset", "Offset a polyline curve", "Studioavw", "Polyline") {
     }
 
     /// <summary>

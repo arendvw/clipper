@@ -22,7 +22,7 @@ namespace StudioAvw.Clipper.Components {
     /// Initializes a new instance of the C# ScriptComponent class.
     /// </summary>
     public ClipperBooleanComponent()
-      : base("PolylineBoolean", "PolylineBoolean", "Boolean operation between 2 sets of curves", "StudioAvw", "Polygon") {
+      : base("Polyline Boolean", "PolyBoolean", "Boolean operation between 2 sets of curves", "StudioAvw", "Polyline") {
     }
 
     /// <summary>

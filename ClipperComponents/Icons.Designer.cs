@@ -83,6 +83,16 @@ namespace StudioAvw.Clipper.Components {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Icon_MinkowskiDiff {
+            get {
+                object obj = ResourceManager.GetObject("Icon_MinkowskiDiff", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Icon_Offset {
             get {
                 object obj = ResourceManager.GetObject("Icon_Offset", resourceCulture);

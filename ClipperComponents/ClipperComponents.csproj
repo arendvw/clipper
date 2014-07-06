@@ -95,6 +95,9 @@
   <ItemGroup>
     <None Include="Resources\Icon_Offset.png" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Icons\Icon_MinkowskiDiff.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>Copy "$(TargetPath)" "$(TargetDir)$(ProjectName).gha"

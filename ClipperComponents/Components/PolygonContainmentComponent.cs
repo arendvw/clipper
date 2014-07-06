@@ -21,7 +21,7 @@ namespace StudioAvw.Clipper.Components {
     /// Initializes a new instance of the C# ScriptComponent class.
     /// </summary>
     public ClipperPolygonInsideComponent()
-      : base("Polygon Containment", "PolyContain", "Tests if a point is inside a polygon", "StudioAvw", "Polygon") {
+      : base("Polyline Containment", "PolyContain", "Tests if a point is inside a Polyline", "StudioAvw", "Polyline") {
     }
 
     /// <summary>

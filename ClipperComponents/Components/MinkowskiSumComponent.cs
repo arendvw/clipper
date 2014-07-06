@@ -22,7 +22,7 @@ namespace StudioAvw.Clipper.Components {
     /// Initializes a new instance of the C# ScriptComponent class.
     /// </summary>
     public ClipperMinkowskiSumComponent()
-      : base("Minkowski Sum", "Minkowski", "Calculate the minkowski sum of two polygons", "Studioavw", "Polygon") {
+      : base("Minkowski Sum", "MinkowskiSum", "Calculate the minkowski sum of two polygons", "Studioavw", "Polyline") {
     }
 
     /// <summary>

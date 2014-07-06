@@ -22,7 +22,7 @@ namespace StudioAvw.Clipper.Components {
     /// Initializes a new instance of the C# ScriptComponent class.
     /// </summary>
     public ClipperMinkowskiDiffComponent()
-      : base("Minkowski Difference", "Minkowski", "Calculate the minkowski difference of two polygons", "Studioavw", "Polygon") {
+      : base("Minkowski Difference", "MinkowskiDiff", "Calculate the minkowski difference of two Polylines", "Studioavw", "Polyline") {
     }
 
     /// <summary>
@@ -97,7 +97,7 @@ namespace StudioAvw.Clipper.Components {
     
     protected override System.Drawing.Bitmap Icon {
       get {
-        return Icons.Icon_Minkowski;
+        return Icons.Icon_MinkowskiDiff;
       }
     }
 
