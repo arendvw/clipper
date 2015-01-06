@@ -1,19 +1,24 @@
-﻿namespace ClipperPlugin {
+﻿using System.Reflection;
+using System.Runtime.InteropServices;
+using Rhino.PlugIns;
+
+namespace ClipperPlugin {
+
   ///<summary>
   /// <para>Every RhinoCommon .rhp assembly must have one and only one PlugIn-derived
   /// class. DO NOT create instances of this class yourself. It is the
   /// responsibility of Rhino to create an instance of this class.</para>
   /// <para>To complete plug-in information, please also see all PlugInDescription
-  /// attributes in AssemblyInfo.cs (you might need to click "Project" ->
+  /// attributes in AssemblyInfo.cs (you might need to click "CPlane" ->
   /// "Show All Files" to see it in the "Solution Explorer" window).</para>
   ///</summary>
-  public class ClipperPluginPlugIn : Rhino.PlugIns.PlugIn {
-    public ClipperPluginPlugIn() {
+  public class ClipperPlugin : PlugIn {
+    public ClipperPlugin() {
       Instance = this;
     }
 
-    ///<summary>Gets the only instance of the ClipperPluginPlugIn plug-in.</summary>
-    public static ClipperPluginPlugIn Instance {
+    ///<summary>Gets the only instance of the ClipperPlugin plug-in.</summary>
+    public static ClipperPlugin Instance {
       get;
       private set;
     }

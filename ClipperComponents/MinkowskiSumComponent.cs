@@ -1,17 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Grasshopper.Kernel;
-using Rhino.Geometry;
-using System.Windows.Forms;
 using System.Drawing;
-using Grasshopper.Kernel.Data;
-using Grasshopper.Kernel.Types;
+using System.Linq;
+using Grasshopper.Kernel;
+using Rhino;
+using Rhino.Geometry;
+using StudioAvw.Clipper.Components.Helpers;
 using StudioAvw.Geometry;
-using StudioAvw.Tools;
-using ClipperLib;
-
 
 namespace StudioAvw.Clipper.Components {
   /// <summary>
@@ -28,17 +23,19 @@ namespace StudioAvw.Clipper.Components {
     /// <summary>
     /// Registers all the input parameters for this component.
     /// </summary>
-    protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager) {
+    /// <param name="pManager">Use the pManager to register new parameters. pManager is never null.</param>
+    protected override void RegisterInputParams(GH_InputParamManager pManager) {
       pManager.AddCurveParameter("A", "A", "The first polyline", GH_ParamAccess.item);
       pManager.AddCurveParameter("B", "B", "The second polyline", GH_ParamAccess.item);
       pManager.AddPlaneParameter("Plane", "Pln", "Plane to project the polylines to", GH_ParamAccess.item, default(Plane));
-      pManager.AddNumberParameter("Tolerance", "T", "Tolerance: all floating point data beyond this precision will be discarded.", GH_ParamAccess.item, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
+      pManager.AddNumberParameter("Tolerance", "T", "Tolerance: all floating point data beyond this precision will be discarded.", GH_ParamAccess.item, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
     }
 
     /// <summary>
     /// Registers all the output parameters for this component.
     /// </summary>
-    protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager) {
+    /// <param name="pManager">Use the pManager to register new parameters. pManager is never null.</param>
+    protected override void RegisterOutputParams(GH_OutputParamManager pManager) {
       pManager.AddCurveParameter("Sum", "S", "Minkowski sum placed relative to A", GH_ParamAccess.list);
       pManager.AddCurveParameter("DisplacedSum", "D", "Minkowski sum curves with displacements of B", GH_ParamAccess.list);
     }
@@ -46,58 +43,46 @@ namespace StudioAvw.Clipper.Components {
     /// <summary>
     /// This is the method that actually does the work.
     /// </summary>
-    /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
-    protected override void SolveInstance(IGH_DataAccess DA) {
+    /// <param name="da">The DA object is used to retrieve from inputs and store in outputs.</param>
+    protected override void SolveInstance(IGH_DataAccess da) {
       // SET ALL INPUT PARAMETERS
-      Polyline plA = default(Polyline);
-      if (!Polyline3D.ConvertCurveToPolyline(DA.Fetch<Curve>("A"), out plA))
+      Polyline plA;
+      if (!Polyline3D.ConvertCurveToPolyline(da.Fetch<Curve>("A"), out plA))
       {
-        this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Unable to convert to polyline from curve");
+        AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Unable to convert to polyline from curve");
         return;
       }
-      Polyline plB = default(Polyline);
-      if (!Polyline3D.ConvertCurveToPolyline(DA.Fetch<Curve>("B"), out plB)) {
-        this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Unable to convert to polyline from curve");
+      Polyline plB;
+      if (!Polyline3D.ConvertCurveToPolyline(da.Fetch<Curve>("B"), out plB)) {
+        AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Unable to convert to polyline from curve");
         return;
       }
 
-      Plane pln = DA.Fetch<Plane>("Plane");
-      double tolerance = DA.Fetch<double>("Tolerance");
+      Plane pln = da.Fetch<Plane>("Plane");
+      double tolerance = da.Fetch<double>("Tolerance");
       if (pln.Equals(default(Plane)))
       {
         pln = plA.FitPlane();
       }
 
-      Point3d ptCenter = new Box(pln, plB).Center;
-
-      List<Polyline> outCurves = new List<Polyline>();
-      List<Polyline> outDisplacedCurves = new List<Polyline>();
-      foreach (List<IntPoint> path in ClipperLib.Clipper.MinkowskiSum(plA.ToPath2D(pln, tolerance), plB.ToPath2D(pln, tolerance), true)) {
-        Polyline plSum = path.ToPolyline(pln, tolerance, true);
-        //Polyline plDisplacedSum = new Polyline(plSum);
-        //plDisplacedSum.Transform(Transform.Translation(-new Vector3d(ptCenter)));
-        outCurves.Add(plSum);
-        //outDisplacedCurves.Add(plDisplacedSum);
-      }
-
-      
+      List<Polyline> outCurves = ClipperLib.Clipper.MinkowskiSum(
+        plA.ToPath2D(pln, tolerance), 
+        plB.ToPath2D(pln, tolerance), 
+        true)
+        .Select(path => path.ToPolyline(pln, tolerance, true))
+        .ToList();
 
 
       // OUTPUT LOGIC
-      DA.SetDataList("Sum", outCurves);
-      DA.SetDataList("DisplacedSum", outCurves);
+      da.SetDataList("Sum", outCurves);
+      da.SetDataList("DisplacedSum", outCurves);
     }
-
-    /// ADDITIONAL CODE
-
-
 
     /// <summary>
     /// Provides an Icon for the component.
     /// </summary>
-    /// 
     
-    protected override System.Drawing.Bitmap Icon {
+    protected override Bitmap Icon {
       get {
         return Icons.Icon_Minkowski;
       }

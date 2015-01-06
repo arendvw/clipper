@@ -1,35 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using ClipperLib;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
-using System.Windows.Forms;
-using System.Drawing;
-using Grasshopper.Kernel.Data;
-using Grasshopper.Kernel.Types;
+using StudioAvw.Clipper.Components.Helpers;
 using StudioAvw.Geometry;
-using StudioAvw.Tools;
-
 
 namespace StudioAvw.Clipper.Components {
   /// <summary>
   /// Creates a CScriptComponent
   /// </summary>
-  public class ClipperPolygonInsideComponent : GH_Component {
+  public class ClipperMinkowskiDiffComponent : GH_Component {
     /// <summary>
     /// Initializes a new instance of the C# ScriptComponent class.
     /// </summary>
-    public ClipperPolygonInsideComponent()
-      : base("Polyline Containment", "PolyContain", "Tests if a point is inside a Polyline", "StudioAvw", "Polyline") {
+    public ClipperMinkowskiDiffComponent()
+      : base("Minkowski Difference", "MinkowskiDiff", "Calculate the minkowski difference of two Polylines", "Studioavw", "Polyline") {
     }
 
     /// <summary>
     /// Registers all the input parameters for this component.
     /// </summary>
     protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager) {
-      pManager.AddCurveParameter("Polyline", "Pl", "A list of polylines to offset", GH_ParamAccess.item);
-      pManager.AddPointParameter("Point", "P", "Offset Distance", GH_ParamAccess.item);
+      pManager.AddCurveParameter("A", "A", "The first polyline", GH_ParamAccess.item);
+      pManager.AddCurveParameter("B", "B", "The second polyline", GH_ParamAccess.item);
       pManager.AddPlaneParameter("Plane", "Pln", "Plane to project the polylines to", GH_ParamAccess.item, default(Plane));
       pManager.AddNumberParameter("Tolerance", "T", "Tolerance: all floating point data beyond this precision will be discarded.", GH_ParamAccess.item, Rhino.RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
     }
@@ -38,7 +32,7 @@ namespace StudioAvw.Clipper.Components {
     /// Registers all the output parameters for this component.
     /// </summary>
     protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager) {
-      pManager.AddIntegerParameter("Inside", "I", "-1 if the point is on the boundary, +1 if inside, 0 if outside",  GH_ParamAccess.item);
+      pManager.AddCurveParameter("Difference", "D", "Minkowski difference placed relative to A", GH_ParamAccess.list);
     }
 
     /// <summary>
@@ -48,20 +42,41 @@ namespace StudioAvw.Clipper.Components {
     protected override void SolveInstance(IGH_DataAccess DA) {
       // SET ALL INPUT PARAMETERS
       Polyline plA = default(Polyline);
-      if (!Polyline3D.ConvertCurveToPolyline(DA.Fetch<Curve>("Polyline"), out plA)) {
+      if (!Polyline3D.ConvertCurveToPolyline(DA.Fetch<Curve>("A"), out plA))
+      {
         this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Unable to convert to polyline from curve");
         return;
       }
-      Point3d pt = DA.Fetch<Point3d>("Point");
+      Polyline plB = default(Polyline);
+      if (!Polyline3D.ConvertCurveToPolyline(DA.Fetch<Curve>("B"), out plB)) {
+        this.AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Unable to convert to polyline from curve");
+        return;
+      }
+
       Plane pln = DA.Fetch<Plane>("Plane");
       double tolerance = DA.Fetch<double>("Tolerance");
-      
       if (pln.Equals(default(Plane)))
       {
         pln = plA.FitPlane();
       }
 
-      DA.SetData("Inside", plA.IsInside(pt,pln, tolerance));
+      Point3d ptCenter = new Box(pln, plB).Center;
+
+      List<Polyline> outCurves = new List<Polyline>();
+      List<Polyline> outDisplacedCurves = new List<Polyline>();
+      foreach (List<IntPoint> path in ClipperLib.Clipper.MinkowskiDiff(plA.ToPath2D(pln, tolerance), plB.ToPath2D(pln, tolerance))) {
+        Polyline plSum = path.ToPolyline(pln, tolerance, true);
+        //Polyline plDisplacedSum = new Polyline(plSum);
+        //plDisplacedSum.Transform(Transform.Translation(-new Vector3d(ptCenter)));
+        outCurves.Add(plSum);
+        //outDisplacedCurves.Add(plDisplacedSum);
+      }
+
+      
+
+
+      // OUTPUT LOGIC
+      DA.SetDataList("Difference", outCurves);
     }
 
     /// ADDITIONAL CODE
@@ -75,7 +90,7 @@ namespace StudioAvw.Clipper.Components {
     
     protected override System.Drawing.Bitmap Icon {
       get {
-        return Icons.Icon_PointInside;
+        return Icons.Icon_MinkowskiDiff;
       }
     }
 
@@ -85,7 +100,7 @@ namespace StudioAvw.Clipper.Components {
     public override Guid ComponentGuid {
       // generate guid.
       get {
-        return new Guid("{889BB614-57F1-4C3B-A826-F3CA904391EE}");
+        return new Guid("{C7A39F41-798C-43C3-86CD-8E06547BA4CB}");
       }
 
     }

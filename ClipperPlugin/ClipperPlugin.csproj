@@ -54,8 +54,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="OffsetPolygonCommand.cs" />
-    <Compile Include="ClipperPluginPlugIn.cs" />
+    <Compile Include="ClipperPlugin.cs" />
+    <Compile Include="Options\EnumOption.cs" />
+    <Compile Include="Options\GetEnumPoint.cs" />
+    <Compile Include="Options\PolylineBooleanOptions.cs" />
+    <Compile Include="Options\OffsetPolylineOptions.cs" />
+    <Compile Include="Commands\BooleanPolylineCommand.cs" />
+    <Compile Include="Commands\OffsetPolylineCommand.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

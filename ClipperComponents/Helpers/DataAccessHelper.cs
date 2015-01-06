@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿using System.Collections.Generic;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Data;
 using Grasshopper.Kernel.Types;
 
-namespace StudioAvw.Tools {
+namespace StudioAvw.Clipper.Components.Helpers {
   static class DataAccessHelper {
 
 
@@ -16,25 +11,25 @@ namespace StudioAvw.Tools {
     /// Fetch data at index position
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="DA"></param>
+    /// <param name="da"></param>
     /// <param name="position"></param>
     /// <returns></returns>
-    static public T Fetch<T>(this IGH_DataAccess DA, int position) {
+    static public T Fetch<T>(this IGH_DataAccess da, int position) {
       
       T temp = default(T);
-      DA.GetData<T>(position, ref temp);
+      da.GetData<T>(position, ref temp);
       return temp;
     }
     /// <summary>
     /// Fetch data with name
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="DA"></param>
+    /// <param name="da"></param>
     /// <param name="name"></param>
     /// <returns></returns>
-    static public T Fetch<T>(this IGH_DataAccess DA, string name) {
+    static public T Fetch<T>(this IGH_DataAccess da, string name) {
       T temp = default(T);
-      DA.GetData<T>(name, ref temp);
+      da.GetData<T>(name, ref temp);
       return temp;
     }
 
@@ -42,12 +37,12 @@ namespace StudioAvw.Tools {
     /// Fetch data list with position
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="DA"></param>
+    /// <param name="da"></param>
     /// <param name="position"></param>
     /// <returns></returns>
-    static public List<T> FetchList<T>(this IGH_DataAccess DA, int position) {
+    static public List<T> FetchList<T>(this IGH_DataAccess da, int position) {
       List<T> temp = new List<T>();
-      DA.GetDataList<T>(position, temp);
+      da.GetDataList<T>(position, temp);
       return temp;
     }
 
@@ -55,24 +50,24 @@ namespace StudioAvw.Tools {
     /// Fetch data list with name
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="DA"></param>
+    /// <param name="da"></param>
     /// <param name="name"></param>
     /// <returns></returns>
-    static public List<T> FetchList<T>(this IGH_DataAccess DA, string name) {
+    static public List<T> FetchList<T>(this IGH_DataAccess da, string name) {
       List<T> temp = new List<T>();
-      DA.GetDataList<T>(name, temp);
+      da.GetDataList<T>(name, temp);
       return temp;
     }
     /// <summary>
     /// Fetch structure with position
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="DA"></param>
+    /// <param name="da"></param>
     /// <param name="position"></param>
     /// <returns></returns>
-    static public GH_Structure<T> FetchTree<T>(this IGH_DataAccess DA, int position) where T : IGH_Goo {
+    static public GH_Structure<T> FetchTree<T>(this IGH_DataAccess da, int position) where T : IGH_Goo {
       GH_Structure<T> temp;
-      DA.GetDataTree<T>(position, out temp);
+      da.GetDataTree<T>(position, out temp);
       return temp;
     }
 
@@ -80,12 +75,12 @@ namespace StudioAvw.Tools {
     /// Fetch structure with name
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="DA"></param>
+    /// <param name="da"></param>
     /// <param name="name"></param>
     /// <returns></returns>
-    static public GH_Structure<T> FetchTree<T>(this IGH_DataAccess DA, string name) where T : IGH_Goo {
+    static public GH_Structure<T> FetchTree<T>(this IGH_DataAccess da, string name) where T : IGH_Goo {
       GH_Structure<T> temp;
-      DA.GetDataTree<T>(name, out temp);
+      da.GetDataTree<T>(name, out temp);
       return temp;
     }
   }

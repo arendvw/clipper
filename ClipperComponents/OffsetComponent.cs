@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
-using System.Windows.Forms;
-using System.Drawing;
-using Grasshopper.Kernel.Data;
-using Grasshopper.Kernel.Types;
+using StudioAvw.Clipper.Components.Helpers;
 using StudioAvw.Geometry;
-using StudioAvw.Tools;
-
 
 namespace StudioAvw.Clipper.Components {
   /// <summary>
@@ -20,6 +14,7 @@ namespace StudioAvw.Clipper.Components {
     /// <summary>
     /// Initializes a new instance of the C# ScriptComponent class.
     /// </summary>
+    /// <exclude />
     public ClipperOffsetComponent()
       : base("Polyline Offset", "PolyOffset", "Offset a polyline curve", "Studioavw", "Polyline") {
     }
@@ -27,7 +22,8 @@ namespace StudioAvw.Clipper.Components {
     /// <summary>
     /// Registers all the input parameters for this component.
     /// </summary>
-    protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager) {
+    /// <param name="pManager">Use the pManager to register new parameters. pManager is never null.</param>
+    protected override void RegisterInputParams(GH_InputParamManager pManager) {
       // set the message for this component.
       pManager.AddCurveParameter("Polylines", "P", "A list of polylines to offset", GH_ParamAccess.list);
       pManager.AddNumberParameter("Distance", "D", "Offset Distance", GH_ParamAccess.item);
@@ -45,7 +41,8 @@ namespace StudioAvw.Clipper.Components {
     /// <summary>
     /// Registers all the output parameters for this component.
     /// </summary>
-    protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager) {
+    /// <param name="pManager">Use the pManager to register new parameters. pManager is never null.</param>
+    protected override void RegisterOutputParams(GH_OutputParamManager pManager) {
       pManager.AddCurveParameter("Contour", "C", "Contour polylines", GH_ParamAccess.list);
       pManager.AddCurveParameter("Holes", "H", "Holes polylines", GH_ParamAccess.list);
     }
@@ -53,30 +50,35 @@ namespace StudioAvw.Clipper.Components {
     /// <summary>
     /// This is the method that actually does the work.
     /// </summary>
-    /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
-    protected override void SolveInstance(IGH_DataAccess DA) {
+    /// <param name="da">The DA object is used to retrieve from inputs and store in outputs.</param>
+    protected override void SolveInstance(IGH_DataAccess da) {
       // SET ALL INPUT PARAMETERS
-      List<Curve> curves = DA.FetchList<Curve>("Polylines");
-      double dist = DA.Fetch<double>("Distance");
-      Plane pln = DA.Fetch<Plane>("Plane");
-      double tolerance = DA.Fetch<double>("Tolerance");
-      List<Polyline3D.OpenFilletType> openType = DA.FetchList<int>("OpenFillet").Cast<Polyline3D.OpenFilletType>().ToList();
-      if (openType == null || openType.Count == 0) {
+      List<Curve> curves = da.FetchList<Curve>("Polylines");
+      double dist = da.Fetch<double>("Distance");
+      Plane pln = da.Fetch<Plane>("Plane");
+      double tolerance = da.Fetch<double>("Tolerance");
+      List<Polyline3D.OpenFilletType> openType = da.FetchList<int>("OpenFillet").Cast<Polyline3D.OpenFilletType>().ToList();
+      if (openType.Count == 0) {
         openType = new List<Polyline3D.OpenFilletType> { Polyline3D.OpenFilletType.Square };
       }
-      double miter = DA.Fetch<double> ("Miter");
+      double miter = da.Fetch<double> ("Miter");
 
-      List<Polyline3D.ClosedFilletType> closedType = DA.FetchList<int>("ClosedFillet").Cast<Polyline3D.ClosedFilletType>().ToList();
+      List<Polyline3D.ClosedFilletType> closedType = da.FetchList<int>("ClosedFillet").Cast<Polyline3D.ClosedFilletType>().ToList();
 
-      IEnumerable<Polyline> polylines = Polyline3D.ConvertCurvesToPolyline(curves);
+      List<Polyline> polylines = Polyline3D.ConvertCurvesToPolyline(curves).ToList();
       
+      if (curves.Count == 0)
+      {
+          return;
+      }
+
       if (pln.Equals(default(Plane)))
       {
         pln = polylines.First().FitPlane();
       }
 
       // set default fillet type.
-      if (closedType == null || closedType.Count == 0) {
+      if (closedType.Count == 0) {
         closedType = new List<Polyline3D.ClosedFilletType> { Polyline3D.ClosedFilletType.Square };
       }
 
@@ -90,17 +92,13 @@ namespace StudioAvw.Clipper.Components {
 
 
       // OUTPUT LOGIC
-      DA.SetDataList("Contour", outside.First());
-      DA.SetDataList("Holes", holes.First());
+      da.SetDataList("Contour", outside.First());
+      da.SetDataList("Holes", holes.First());
     }
-
-    /// ADDITIONAL CODE
 
     /// <summary>
     /// Provides an Icon for the component.
     /// </summary>
-    /// 
-    
     protected override System.Drawing.Bitmap Icon {
       get {
         return Icons.Icon_Offset;

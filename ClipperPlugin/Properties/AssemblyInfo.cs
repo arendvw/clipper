@@ -1,30 +1,28 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Rhino.PlugIns;
-
 
 // Plug-in Description Attributes - all of these are optional
 // These will show in Rhino's option dialog, in the tab Plug-ins
 [assembly: PlugInDescription(DescriptionType.Address, "-")]
-[assembly: PlugInDescription(DescriptionType.Country, "-")]
-[assembly: PlugInDescription(DescriptionType.Email, "-")]
+[assembly: PlugInDescription(DescriptionType.Country, @"Netherlands")]
+[assembly: PlugInDescription(DescriptionType.Email, @"arend@studioavw.nl")]
 [assembly: PlugInDescription(DescriptionType.Phone, "-")]
 [assembly: PlugInDescription(DescriptionType.Fax, "-")]
-[assembly: PlugInDescription(DescriptionType.Organization, "-")]
-[assembly: PlugInDescription(DescriptionType.UpdateUrl, "-")]
-[assembly: PlugInDescription(DescriptionType.WebSite, "-")]
+[assembly: PlugInDescription(DescriptionType.Organization, @"StudioAvw")]
+[assembly: PlugInDescription(DescriptionType.UpdateUrl, @"http://www.food4rhino.com/project/clipper")]
+[assembly: PlugInDescription(DescriptionType.WebSite, @"http://www.food4rhino.com/project/clipper")]
 
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("ClipperPlugin")] // Plug-In title is extracted from this
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Provices polyline offset and boolean capabilities to Rhino")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("StudioAvw")]
 [assembly: AssemblyProduct("ClipperPlugin")]
-[assembly: AssemblyCopyright("Copyright ©  2014")]
+[assembly: AssemblyCopyright("Copyright © 2014 Arend van Waart / Boost Open Source Licence")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -46,5 +44,6 @@ using Rhino.PlugIns;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("0.0.2.0")]
+[assembly: AssemblyFileVersion("0.0.2.0")]
+[assembly: AssemblyInformationalVersion("2")]
