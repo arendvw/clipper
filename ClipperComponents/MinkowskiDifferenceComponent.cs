@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ClipperLib;
 using Grasshopper.Kernel;
+using Rhino;
 using Rhino.Geometry;
 using StudioAvw.Clipper.Components.Helpers;
 using StudioAvw.Geometry;
@@ -31,8 +32,10 @@ namespace StudioAvw.Clipper.Components {
     /// <summary>
     /// Registers all the output parameters for this component.
     /// </summary>
-    protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager) {
-      pManager.AddCurveParameter("Difference", "D", "Minkowski difference placed relative to A", GH_ParamAccess.list);
+    
+      protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager) {
+        
+          pManager.AddCurveParameter("Difference", "D", "Minkowski difference placed relative to A", GH_ParamAccess.list);
     }
 
     /// <summary>
