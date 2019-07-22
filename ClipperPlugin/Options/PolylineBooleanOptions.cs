@@ -50,43 +50,28 @@ namespace ClipperPlugin.Options
         /// Tolerance for double to integer conversion for the clipper library
         /// 0.014321 with a tolerance of 0.001 will become 0.014
         /// </summary>
-        public double Tolerance
-        {
-            get { return _tolerance.CurrentValue; }
-        }
+        public double Tolerance => _tolerance.CurrentValue;
 
         /// <summary>
         /// Should the result be dynamically shown?
         /// </summary>
-        public bool HasDynamicPreview
-        {
-            get { return _dynamicPreviewToggle.CurrentValue; }
-        }
+        public bool HasDynamicPreview => _dynamicPreviewToggle.CurrentValue;
 
         /// <summary>
         /// The CPlane to which the result should be projected
         /// </summary>
-        public ProjectToCplane ProjectToCplane
-        {
-            get { return (ProjectToCplane)GetEnumValue("ProjectTo"); }
-        }
+        public ProjectToCplane ProjectToCplane => (ProjectToCplane)GetEnumValue("ProjectTo");
 
         /// <summary>
         /// Boolean type of the current boolean operation
         /// </summary>
-        public BooleanType BooleanType
-        {
-            get { return (BooleanType)GetEnumValue("BooleanType"); }
-        }
+        public BooleanType BooleanType => (BooleanType)GetEnumValue("BooleanType");
 
         /// <summary>
         /// Filling rule: Even/Odd or Non-Zero?
         /// </summary>
-        public bool EvenOdd
-        {
-            get { return _evenOdd.CurrentValue; }
-        }
-        
+        public bool EvenOdd => _evenOdd.CurrentValue;
+
         /// <summary>
         /// Initialize the values of the element
         /// </summary>
@@ -119,7 +104,7 @@ namespace ClipperPlugin.Options
                 Plane.FitPlaneToPoints(_curvesA.First(), out pln);
             }
 
-            if (!this.BooleanType.Equals(BooleanType.MassUnion))
+            if (!BooleanType.Equals(BooleanType.MassUnion))
             {
                 _result = Polyline3D.Boolean((ClipType) (int) BooleanType, _curvesA, _curvesB, pln, Tolerance, EvenOdd);
             }
@@ -145,7 +130,7 @@ namespace ClipperPlugin.Options
         /// <value>
         /// The results.
         /// </value>
-        public List<Polyline> Results {  get { return _result; } }
+        public List<Polyline> Results => _result;
 
         /// <summary>
         /// Sets the original curves.
@@ -192,11 +177,11 @@ namespace ClipperPlugin.Options
         /// </summary>
         internal void ToggleBoolean()
         {
-            int currentItem = (int) this.BooleanType;
+            int currentItem = (int) BooleanType;
             var newCurrentItem = (currentItem + 1)%4;
             
             RhinoApp.WriteLine("Showing current boolean type: {0}, Old: {1}, New: {2}", (BooleanType) newCurrentItem, currentItem, newCurrentItem);
-            RhinoApp.WriteLine("New booleanType {0} {1}", this.BooleanType, (int) this.BooleanType);
+            RhinoApp.WriteLine("New booleanType {0} {1}", BooleanType, (int) BooleanType);
             SetEnumValue("BooleanType", newCurrentItem);
             CalculateBoolean();
         }

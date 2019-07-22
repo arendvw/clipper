@@ -35,10 +35,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="GH_IO">
-      <HintPath>..\..\..\..\..\..\_GRASSHOPPER\0.9.76.0\GH_IO.dll</HintPath>
+      <HintPath>..\..\..\..\..\GH\0.9.76.0\GH_IO.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Grasshopper">
-      <HintPath>..\..\..\..\..\..\_GRASSHOPPER\0.9.76.0\Grasshopper.dll</HintPath>
+      <HintPath>..\..\..\..\..\GH\0.9.76.0\Grasshopper.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="RhinoCommon">
       <HintPath>..\..\..\..\..\..\Program Files\Rhinoceros 5 (64-bit)\System\RhinoCommon.dll</HintPath>
@@ -56,6 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BooleanComponent.cs" />
+    <Compile Include="ClipperAssemblyInfo.cs" />
     <Compile Include="Helpers\DataAccessHelper.cs" />
     <Compile Include="Icons.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -72,14 +75,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Triangulator\CyclicalList.cs" />
-    <Compile Include="Triangulator\IndexableCyclicalLinkedList.cs" />
-    <Compile Include="Triangulator\LineSegment.cs" />
-    <Compile Include="Triangulator\MeshPolygons.cs" />
-    <Compile Include="Triangulator\Triangle.cs" />
-    <Compile Include="Triangulator\Triangulator.cs" />
-    <Compile Include="Triangulator\Vector2.cs" />
-    <Compile Include="Triangulator\Vertex.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ClipperTools\ClipperTools.csproj">
@@ -116,9 +111,7 @@
   <ItemGroup>
     <None Include="Icons\Icon_MinkowskiDiff.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Components\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>Copy "$(TargetPath)" "$(TargetDir)$(ProjectName).gha"

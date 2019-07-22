@@ -13,7 +13,7 @@ namespace ClipperPlugin.Options
         /// <param name="name">The name.</param>
         /// <param name="index">The index.</param>
         /// <param name="intialValue">The intial value.</param>
-        public EnumOption (string name, int index, int intialValue)
+        public EnumOption(string name, int index, int intialValue)
         {
             Name = name;
             Value = intialValue;
@@ -49,9 +49,9 @@ namespace ClipperPlugin.Options
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T GetValue<T> () where T: struct, IConvertible
+        public T GetValue<T>() where T : struct, IConvertible
         {
-            return (T) (object) Value;
+            return (T)(object)Value;
         }
     }
 }

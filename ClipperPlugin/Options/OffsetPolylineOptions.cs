@@ -21,50 +21,23 @@ namespace ClipperPlugin.Options
         private OptionDouble _miter;
         private OptionToggle _dynamicPreviewToggle;
 
-        public double OffsetDistance
-        {
-            get { return _offsetDistance.CurrentValue; }
-        }
+        public double OffsetDistance => _offsetDistance.CurrentValue;
 
-        public double Tolerance
-        {
-            get { return _tolerance.CurrentValue; }
-        }
+        public double Tolerance => _tolerance.CurrentValue;
 
-        public double ArcTolerance
-        {
-            get { return _arcTolerance.CurrentValue; }
-        }
+        public double ArcTolerance => _arcTolerance.CurrentValue;
 
-        public double Miter
-        {
-            get { return _miter.CurrentValue; }
-        }
+        public double Miter => _miter.CurrentValue;
 
-        public bool HasDynamicPreview
-        {
-            get { return _dynamicPreviewToggle.CurrentValue; }
-        }
+        public bool HasDynamicPreview => _dynamicPreviewToggle.CurrentValue;
 
-        public Polyline3D.OpenFilletType OpenFillet
-        {
-            get { return (Polyline3D.OpenFilletType) GetEnumValue("OpenFillet");  }
-        }
+        public Polyline3D.OpenFilletType OpenFillet => (Polyline3D.OpenFilletType)GetEnumValue("OpenFillet");
 
-        public Polyline3D.ClosedFilletType ClosedFillet
-        {
-            get { return (Polyline3D.ClosedFilletType)GetEnumValue("ClosedFillet"); }
-        }
+        public Polyline3D.ClosedFilletType ClosedFillet => (Polyline3D.ClosedFilletType)GetEnumValue("ClosedFillet");
 
-        public ProjectToCplane ProjectToCplane
-        {
-            get { return (ProjectToCplane)GetEnumValue("ProjectTo"); }
-        }
+        public ProjectToCplane ProjectToCplane => (ProjectToCplane)GetEnumValue("ProjectTo");
 
-        public Side Side
-        {
-            get { return (Side)GetEnumValue("Side"); }
-        }
+        public Side Side => (Side)GetEnumValue("Side");
 
         /// <summary>
         /// Initializes the specified absolute tolerance.
@@ -74,12 +47,12 @@ namespace ClipperPlugin.Options
         public void Initialize(double absoluteTolerance, bool isScripted)
         {
             EnableTransparentCommands(true);
-            
+
             _offsetDistance = new OptionDouble(10, absoluteTolerance, double.MaxValue);
-            _tolerance = new OptionDouble(absoluteTolerance/10, RhinoMath.ZeroTolerance, double.MaxValue);
+            _tolerance = new OptionDouble(absoluteTolerance / 10, RhinoMath.ZeroTolerance, double.MaxValue);
             _arcTolerance = new OptionDouble(0.25, RhinoMath.ZeroTolerance, double.MaxValue);
             _miter = new OptionDouble(1, RhinoMath.ZeroTolerance, double.MaxValue);
-            _dynamicPreviewToggle = new OptionToggle(!isScripted, "Disabled","Enabled");
+            _dynamicPreviewToggle = new OptionToggle(!isScripted, "Disabled", "Enabled");
             AddOptionDouble("Distance", ref _offsetDistance, "Distance");
             AddOptionDouble("Tolerance", ref _tolerance, "Tolerance");
             AddOptionEnum("Side", Side.Both);
@@ -100,18 +73,15 @@ namespace ClipperPlugin.Options
             Plane pln = RhinoDoc.ActiveDoc.Views.ActiveView.ActiveViewport.ConstructionPlane();
             if (ProjectToCplane.Equals(ProjectToCplane.FitToCurve))
             {
-                Rhino.RhinoApp.WriteLine("Using FitToCurve");
+                RhinoApp.WriteLine("Using FitToCurve");
                 Plane.FitPlaneToPoints(_originalCurves.First(), out pln);
             }
 
             var output = new List<Polyline>();
-            List<List<Polyline>> contours;
-            List<List<Polyline>> holes;
-            Polyline3D.Offset(_originalCurves,new List<Polyline3D.OpenFilletType> { OpenFillet }, new List<Polyline3D.ClosedFilletType> { ClosedFillet },
+            Polyline3D.Offset(_originalCurves, new List<Polyline3D.OpenFilletType> { OpenFillet }, new List<Polyline3D.ClosedFilletType> { ClosedFillet },
                 pln, Tolerance, new List<double> { OffsetDistance }, Miter, ArcTolerance,
-                out contours, out holes);
+                out var contours, out var holes);
 
-            RhinoApp.WriteLine(Side.ToString());
             var contour = contours.FirstOrDefault();
             if (contour != null && (Side.Equals(Side.Outside) || Side.Equals(Side.Both)))
             {
@@ -133,7 +103,7 @@ namespace ClipperPlugin.Options
         /// <value>
         /// The resulting offset polylines
         /// </value>
-        public List<Polyline> Results {  get { return _offset; } } 
+        public List<Polyline> Results => _offset;
 
         /// <summary>
         /// Find the closest point in the set of offset curves
@@ -145,7 +115,7 @@ namespace ClipperPlugin.Options
             var closestPoint = _originalCurves.Select((pl, e) =>
             {
                 var cp = pl.ClosestPoint(pt);
-                return new {Point = cp, Distance = pt.DistanceTo(cp) };
+                return new { Point = cp, Distance = pt.DistanceTo(cp) };
             })
             .OrderBy(p => p.Distance)
             .FirstOrDefault();

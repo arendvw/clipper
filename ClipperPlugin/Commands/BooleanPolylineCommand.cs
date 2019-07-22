@@ -31,20 +31,17 @@ namespace ClipperPlugin.Commands
         public static BooleanPolylineCommand Instance { get; private set; }
 
         /// <returns>The command name as it appears on the Rhino command line.</returns>
-        public override string EnglishName
-        {
-            get { return "BooleanPolyline"; }
-        }
+        public override string EnglishName => "BooleanPolyline";
 
         /// <summary>
         /// PolylineBoolean options: these should be persistent along multiple runs.
         /// </summary>
-        private  PolylineBooleanOptions _options;
+        private PolylineBooleanOptions _options;
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
             ObjRef[] objRefsA;
-           // RhinoApp.WriteLine("Hi there!!");
+            // RhinoApp.WriteLine("Hi there!!");
             var rc = RhinoGet.GetMultipleObjects("Select set of curves to Boolean (A)", false, ObjectType.Curve, out objRefsA);
             if (rc != Result.Success)
             {
@@ -77,7 +74,7 @@ namespace ClipperPlugin.Commands
 
             _options.EnableTransparentCommands(true);
             _options.SetOriginalCurves(curvesA, curvesB);
-            
+
             while (true)
             {
                 var res = _options.Get();
@@ -107,7 +104,7 @@ namespace ClipperPlugin.Commands
             }
 
             // deleselect all.
-            doc.Objects.Select(doc.Objects.GetSelectedObjects(true, true).Select(obj=>obj.Id), false);
+            doc.Objects.Select(doc.Objects.GetSelectedObjects(true, true).Select(obj => obj.Id), false);
             // return the offset
             var guids = _options.Results.Select(pl => doc.Objects.AddPolyline(pl));
             doc.Objects.Select(guids);

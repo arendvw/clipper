@@ -34,10 +34,7 @@ namespace ClipperPlugin.Commands
         public static OffsetPolylineCommand Instance { get; private set; }
 
         /// <returns>The command name as it appears on the Rhino command line.</returns>
-        public override string EnglishName
-        {
-            get { return "OffsetPolyline"; }
-        }
+        public override string EnglishName => "OffsetPolyline";
 
         /// <summary>
         /// The _polyline options that are kept persistently among commands
@@ -55,7 +52,7 @@ namespace ClipperPlugin.Commands
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
             ObjRef[] objRefs;
-           // RhinoApp.WriteLine("Hi there!!");
+            // RhinoApp.WriteLine("Hi there!!");
             var rc = RhinoGet.GetMultipleObjects("Select objects to offset", false, ObjectType.Curve, out objRefs);
             if (rc != Result.Success)
             {
@@ -74,7 +71,7 @@ namespace ClipperPlugin.Commands
             }
             _polylineOptions.EnableTransparentCommands(true);
             _polylineOptions.SetOriginalCurves(polylines);
-            
+
             while (true)
             {
                 var res = _polylineOptions.Get();
@@ -106,7 +103,7 @@ namespace ClipperPlugin.Commands
                 RhinoApp.WriteLine("Got command {0}", res);
             }
 
-            
+
             // return the offset
             var guids = _polylineOptions.Results.Select(pl => doc.Objects.AddPolyline(pl));
             RhinoApp.RunScript("SelNone", true);
