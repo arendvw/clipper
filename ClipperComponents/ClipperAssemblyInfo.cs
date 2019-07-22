@@ -4,7 +4,7 @@ using Grasshopper.Kernel;
 
 namespace StudioAvw.Clipper.Components
 {
-    public class CurveComponentsInfo : GH_AssemblyInfo
+    public class ClipperAssemblyInfo : GH_AssemblyInfo
     {
         public override string Description => "Clipper offers reliable polygon offsets and boolean operations";
 
@@ -14,7 +14,7 @@ namespace StudioAvw.Clipper.Components
 
         public override string Version => "0.3.0";
 
-        public override Guid Id => new Guid("{5e1ff3af-bdd0-4fc4-9467-90984f94e7cb}");
+        public override Guid Id => new Guid("{43334b3c-4a74-7648-6ecd-38dfdf4ec67f}");
 
         public override string AuthorName => "Arend van Waart";
 

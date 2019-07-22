@@ -58,7 +58,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BooleanComponent.cs" />
-    <Compile Include="ClipperAssemblyInfo.cs" />
+    <Compile Include="ClipperComponentInfo.cs" />
     <Compile Include="Helpers\DataAccessHelper.cs" />
     <Compile Include="Icons.Designer.cs">
       <AutoGen>True</AutoGen>

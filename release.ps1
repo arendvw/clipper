@@ -153,7 +153,14 @@ Push-Location $temp
 $a = & "$PSScriptRoot\yak.exe" build
 Pop-Location
 
+$yakfile = Get-ChildItem -Path $temp -Filter *.yak | Select-Object -First 1
+Move-Item "$($temp)\$($yakfile)" $output
+
 # Create RHI Installer (zip package)
 Compress-Archive -Path "$($temp)/*" -DestinationPath $outputZip
+Copy-Item $outputZip $output
 Move-Item $outputZip $outputRhi
+Move-Item $outputRhi $output
 Pop-Location;
+
+Write-Host "Done. If you wish to publish the yak file, use the command  .\yak.exe push .\$($output)\$($yakfile)"

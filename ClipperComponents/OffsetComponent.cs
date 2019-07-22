@@ -20,7 +20,7 @@ namespace StudioAvw.Clipper.Components
         /// </summary>
         /// <exclude />
         public ClipperOffsetComponent()
-          : base("Polyline Offset", "PolyOffset", "Offset a polyline curve", "Clipper", "Polyline")
+          : base("Polyline Offset", "PolyOffset", "Offset a polyline curve using Clipper", "Clipper", "Polyline")
         {
         }
 
