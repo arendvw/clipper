@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using System.Runtime.InteropServices;
-using Rhino.PlugIns;
+﻿using Rhino.PlugIns;
 
 namespace ClipperPlugin {
 

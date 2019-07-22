@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>StudioAvw.Clipper.Components</RootNamespace>
     <AssemblyName>ClipperComponents</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -21,6 +21,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <LangVersion>5</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -29,18 +31,17 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="GH_IO">
-      <HintPath>..\..\..\..\..\..\Grasshopper\grasshopper_0.9.76.0\GH_IO.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\..\..\..\..\_GRASSHOPPER\0.9.76.0\GH_IO.dll</HintPath>
     </Reference>
     <Reference Include="Grasshopper">
-      <HintPath>..\..\..\..\..\..\Grasshopper\grasshopper_0.9.76.0\Grasshopper.dll</HintPath>
-      <Private>False</Private>
+      <HintPath>..\..\..\..\..\..\_GRASSHOPPER\0.9.76.0\Grasshopper.dll</HintPath>
     </Reference>
     <Reference Include="RhinoCommon">
-      <HintPath>C:\Program Files\Rhinoceros 5.0 (64-bit)\System\RhinoCommon.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files\Rhinoceros 5 (64-bit)\System\RhinoCommon.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -71,6 +72,14 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Triangulator\CyclicalList.cs" />
+    <Compile Include="Triangulator\IndexableCyclicalLinkedList.cs" />
+    <Compile Include="Triangulator\LineSegment.cs" />
+    <Compile Include="Triangulator\MeshPolygons.cs" />
+    <Compile Include="Triangulator\Triangle.cs" />
+    <Compile Include="Triangulator\Triangulator.cs" />
+    <Compile Include="Triangulator\Vector2.cs" />
+    <Compile Include="Triangulator\Vertex.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ClipperTools\ClipperTools.csproj">

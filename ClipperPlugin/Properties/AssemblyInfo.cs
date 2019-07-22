@@ -13,7 +13,6 @@ using Rhino.PlugIns;
 [assembly: PlugInDescription(DescriptionType.UpdateUrl, @"http://www.food4rhino.com/project/clipper")]
 [assembly: PlugInDescription(DescriptionType.WebSite, @"http://www.food4rhino.com/project/clipper")]
 
-
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
@@ -22,7 +21,7 @@ using Rhino.PlugIns;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("StudioAvw")]
 [assembly: AssemblyProduct("ClipperPlugin")]
-[assembly: AssemblyCopyright("Copyright © 2014 Arend van Waart / Boost Open Source Licence")]
+[assembly: AssemblyCopyright("Copyright © 2017 Arend van Waart / Boost Open Source Licence")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -44,6 +43,6 @@ using Rhino.PlugIns;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.0.2.1")]
-[assembly: AssemblyFileVersion("0.0.2.1")]
+[assembly: AssemblyVersion("0.0.2.3")]
+[assembly: AssemblyFileVersion("0.0.2.3")]
 [assembly: AssemblyInformationalVersion("2")]

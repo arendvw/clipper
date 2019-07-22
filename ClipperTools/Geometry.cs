@@ -453,7 +453,6 @@ namespace StudioAvw.Geometry
     public static Polyline ToPolyline(this List<IntPoint> path, Plane pln, double tolerance, bool closed)
     {
       List<Point3d> polylinepts = new List<Point3d>();
-
       foreach (IntPoint pt in path)
       {
         polylinepts.Add(pln.PointAt(pt.X*tolerance, pt.Y*tolerance));
