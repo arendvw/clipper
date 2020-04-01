@@ -1,6 +1,6 @@
 ---
 name: Clipper
-version: 0.3.0
+version: 0.3.1
 authors:
 - Arend van Waart
 description: Clipper offers reliable polygon offsets and boolean operations for Rhino and Grasshopper
