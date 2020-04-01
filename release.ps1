@@ -179,6 +179,9 @@ $yakVersion = "$($newVersion.Major).$($newVersion.Minor).$($newVersion.Build)";
 ## *\AssemblyInfo.cs
 foreach ($project in $projects) {
      UpdateVersion "$($project)\Properties\AssemblyInfo.cs" $newVersion
+     # Force clean of project
+     Remove-Item -path "$($project)\bin\*" -recurse 
+     Remove-Item -path "$($project)\obj\*" -recurse 
 }
 
 Write-Host "Building new version.."
