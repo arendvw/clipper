@@ -1,5 +1,5 @@
 ### 
-### VARIABLES
+### ALL FiLES TO EXPORT  AFTER BUILD
 ###
 $namePrefix = "Clipper"
 $projects = ".\clippertools", ".\clippercomponents", ".\clipperplugin"
@@ -15,7 +15,19 @@ $grasshopperAssemblyInfofile = "./clippercomponents/ClipperAssemblyInfo.cs";
 
 
 ## Functions
-# Find MS Build
+<#
+.SYNOPSIS
+Find current MSBUILD Version installed on this system.
+
+.DESCRIPTION
+Looks in the usual places for MSBUILD
+
+.PARAMETER MaxVersion
+Maximum visual studio version
+
+.EXAMPLE
+Find-MsBuild 2015
+#>
 Function Find-MsBuild([int] $MaxVersion = 2019)
 {
     $agentPath2019 = "$Env:programfiles (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\msbuild.exe"
@@ -44,6 +56,16 @@ Function Find-MsBuild([int] $MaxVersion = 2019)
     throw "Yikes - Unable to find msbuild"
 }
 
+<#
+.SYNOPSIS
+Find the current assemblyversion in AssemblyInfo.cs
+
+.PARAMETER file
+The full path to the AssemblyInfo.cs
+
+.EXAMPLE
+$file = GetCurrentVersion("C:\\file\\AssemblyInfo.cs")
+#>
 function GetCurrentVersion($file)
 {
     $contents = [System.IO.File]::ReadAllText($file)
@@ -51,8 +73,34 @@ function GetCurrentVersion($file)
     return $versionString.Groups[1];
 }
 
-# We ignore the 4th version number, because this is not recognized in 
-# Semantic versioning. Let's just stick to the first 3.
+<#
+.SYNOPSIS
+
+.DESCRIPTION
+Increments version to a newer version. 
+A fourth version index is always set to zero because semantic versioning 
+does not support a fourth index.
+
+.PARAMETER version
+Current version as a string (eg "1.4.5.6")
+
+.PARAMETER major
+Increment major (first version index) with this amount
+
+.PARAMETER minor
+Increment minor (second version index) with this amount
+
+.PARAMETER build
+Increment build (third version index) with this amount
+
+.EXAMPLE
+IncrementVersion("1.2.3.4", 1, 0, 0)
+
+returns "2.2.3.0"
+
+.NOTES
+General notes
+#>
 function IncrementVersion([string]$version, [int]$major, [int]$minor, [int]$build)
 {
     $v = [Version]::new($version);
@@ -65,7 +113,13 @@ function IncrementVersion([string]$version, [int]$major, [int]$minor, [int]$buil
     return $newVersion
 }
 
-# Update assemblyinfo.cs
+<#
+.SYNOPSIS
+Update an AssemblyInfo.cs with a new version.
+
+.EXAMPLE
+UpdateVersion("C:\\Path\\To\\AssemblyInfo.cs", "1.2.3.0")
+#>
 function UpdateVersion($file, $version)
 {
     $contents = [System.IO.File]::ReadAllText($file)
@@ -74,12 +128,19 @@ function UpdateVersion($file, $version)
     [System.IO.File]::WriteAllText($file, $contents);
 }
 
-function EnsureYak($yak)
+<#
+.SYNOPSIS
+Download yak to $yakLocation if it does not exist
+
+.PARAMETER yakLocation
+Path to where yak is expected C:\\Path\\To\\yak.exe
+#>
+function EnsureYak($yakLocation)
 {
-    if (![System.IO.File]::Exists($yak))
+    if (![System.IO.File]::Exists($yakLocation))
     {
         $url = 'http://files.mcneel.com/yak/tools/latest/yak.exe'
-        Invoke-WebRequest -Uri $url -OutFile $yak
+        Invoke-WebRequest -Uri $url -OutFile $yakLocation
     }
 }
 
@@ -123,11 +184,12 @@ foreach ($project in $projects) {
 Write-Host "Building new version.."
 ## Build a new version
 $msbuild = Find-MsBuild;
-$a = & $msbuild /p:Configuration=Release
+$a = & $msbuild /p:Configuration=Release -t:"Clean;Build"
 
 Write-Host "Packaging new version.."
 # Create empty temporary folder
-$temp = ".\dist"
+$temp = ".\dist\ClipperPlugin.rhp"
+$tempMacRhi = ".\dist"
 $output = '.\output';
 if (Test-Path $temp)
 {
@@ -143,9 +205,9 @@ foreach ($item in $copyToOutput) {
     Copy-Item $item $temp
 }
 
-Write-Host "Packaging rhi version.."
 $outputZip =  ".\$($namePrefix)-$($yakversion).zip";
 $outputRhi =  ".\$($namePrefix)-$($yakversion).rhi"
+$outputMacRhi =  ".\$($namePrefix)-$($yakversion).macrhi"
 
 Write-Host "Packaging yak version.."
 Copy-Item $manifestFile $temp
@@ -154,13 +216,16 @@ $a = & "$PSScriptRoot\yak.exe" build
 Pop-Location
 
 $yakfile = Get-ChildItem -Path $temp -Filter *.yak | Select-Object -First 1
-Move-Item "$($temp)\$($yakfile)" $output
+Move-Item "$($yakfile)" $output
 
+Write-Host "Packaging (mac)rhi version.."
 # Create RHI Installer (zip package)
 Compress-Archive -Path "$($temp)/*" -DestinationPath $outputZip
+Compress-Archive -Path "$($tempMacRhi)/*" -DestinationPath $outputMacRhi
 Copy-Item $outputZip $output
 Move-Item $outputZip $outputRhi
 Move-Item $outputRhi $output
+Move-Item $outputMacRhi $output
 Pop-Location;
 
 Write-Host "Done. If you wish to publish the yak file, use the command  .\yak.exe push .\$($output)\$($yakfile)"
