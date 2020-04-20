@@ -31,7 +31,7 @@ namespace StudioAvw.Clipper.Components
             pManager.AddCurveParameter("Polyline", "Pl", "A list of polylines to offset", GH_ParamAccess.item);
             pManager.AddPointParameter("Point", "P", "Offset Distance", GH_ParamAccess.item);
             pManager.AddPlaneParameter("Plane", "Pln", "Plane to project the polylines to", GH_ParamAccess.item, default);
-            pManager.AddNumberParameter("Tolerance", "T", "Tolerance: all floating point data beyond this precision will be discarded.", GH_ParamAccess.item, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
+            pManager.AddNumberParameter("Tolerance", "T", "Tolerance: all floating point data beyond this precision will be discarded.", GH_ParamAccess.item, DocHelper.GetModelTolerance());
         }
 
         /// <summary>
