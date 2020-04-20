@@ -3,6 +3,7 @@
 ###
 $namePrefix = "Clipper"
 $projects = ".\clippertools", ".\clippercomponents", ".\clipperplugin"
+$solution = ".\ClipperTools.sln"
 $copyToOutput = ".\clippercomponents\bin\Release\ClipperComponents.gha",
 ".\clippercomponents\bin\Release\ClipperComponents.pdb",
 ".\clipperplugin\bin\ClipperPlugin.rhp",
@@ -159,7 +160,7 @@ Write-Host $confirm
 if (-Not ([string]::IsNullOrEmpty($confirm)) -and $confirm -ne 'y') {
     $newVersionInput = Read-Host -Prompt "Enter new version number"
     try {
-    $newVersion = [Version]::new($newVersionInput);
+    $newVersion = [Version]::new($newVersionInput);   $newVersion = [Version]::new($newVersionInput);
     } catch {
         Write-Error "Invalid version"
         exit
@@ -178,7 +179,7 @@ $yakVersion = "$($newVersion.Major).$($newVersion.Minor).$($newVersion.Build)";
 ## Update
 ## *\AssemblyInfo.cs
 foreach ($project in $projects) {
-     UpdateVersion "$($project)\Properties\AssemblyInfo.cs" $newVersion
+     UpdateVersion "$($project)\Properties\AssemblyInfo.cs" $yakVersion
      # Force clean of project
      Remove-Item -path "$($project)\bin\*" -recurse 
      Remove-Item -path "$($project)\obj\*" -recurse 
@@ -187,7 +188,13 @@ foreach ($project in $projects) {
 Write-Host "Building new version.."
 ## Build a new version
 $msbuild = Find-MsBuild;
-$a = & $msbuild /p:Configuration=Release -t:"Clean;Build"
+Write-Host "Building with msbuild $msbuild"
+$result = & $msbuild "/p:Configuration=Release" "/target:clean,restore,build"
+if ($null -eq $result) {
+    Write-Host "Unable to build package:";
+    Write-Host $result;
+    exit;
+}
 
 Write-Host "Packaging new version.."
 # Create empty temporary folder
@@ -210,24 +217,27 @@ foreach ($item in $copyToOutput) {
 
 $outputZip =  ".\$($namePrefix)-$($yakversion).zip";
 $outputRhi =  ".\$($namePrefix)-$($yakversion).rhi"
+$outputZipMacRhi =  ".\$($namePrefix)-$($yakversion).macrhi.zip"
 $outputMacRhi =  ".\$($namePrefix)-$($yakversion).macrhi"
 
 Write-Host "Packaging yak version.."
 Copy-Item $manifestFile $temp
 Push-Location $temp
 $a = & "$PSScriptRoot\yak.exe" build
+Write-Host $a;
 Pop-Location
 
-$yakfile = Get-ChildItem -Path $temp -Filter *.yak | Select-Object -First 1
-Move-Item "$($yakfile)" $output
+$yakfile = Get-ChildItem -recurse -Path $temp -Filter *.yak | Select-Object -First 1
+Move-Item $($yakfile.FullName) $output
 
 Write-Host "Packaging (mac)rhi version.."
 # Create RHI Installer (zip package)
 Compress-Archive -Path "$($temp)/*" -DestinationPath $outputZip
-Compress-Archive -Path "$($tempMacRhi)/*" -DestinationPath $outputMacRhi
+Compress-Archive -Path "$($tempMacRhi)/*" -DestinationPath $outputZipMacRhi
 Copy-Item $outputZip $output
 Move-Item $outputZip $outputRhi
 Move-Item $outputRhi $output
+Move-Item $outputZipMacRhi $outputMacRhi
 Move-Item $outputMacRhi $output
 Pop-Location;
 

@@ -16,11 +16,11 @@ using Rhino.PlugIns;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ClipperPlugin")] // Plug-In title is extracted from this
+[assembly: AssemblyTitle("Clipper")]
 [assembly: AssemblyDescription("Provices polyline offset and boolean capabilities to Rhino")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("StudioAvw")]
-[assembly: AssemblyProduct("ClipperPlugin")]
+[assembly: AssemblyProduct("Clipper")]
 [assembly: AssemblyCopyright("Copyright © 2019 Arend van Waart / Boost Open Source Licence")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
