@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="BooleanComponent.cs" />
     <Compile Include="Helpers\DataAccessHelper.cs" />
+    <Compile Include="Helpers\DocHelper.cs" />
     <Compile Include="Icons.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
