@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using Grasshopper.Kernel;
+using Grasshopper.Kernel.Parameters;
 using Rhino;
 using Rhino.Geometry;
 using StudioAvw.Clipper.Components.Helpers;
@@ -38,9 +39,15 @@ namespace StudioAvw.Clipper.Components
 
             pManager.AddNumberParameter("Tolerance", "T", "Tolerance: all floating point data beyond this precision will be discarded.", GH_ParamAccess.item, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
             //public enum ClosedFilletType { Round, Square, Miter }
-            pManager.AddIntegerParameter("ClosedFillet", "CF", "Closed fillet type (0 = Round, 1 = Square, 2 = Miter)", GH_ParamAccess.list, new List<int> { 1 });
-            ////public enum OpenFilletType { Round, Square, Butt }
-            pManager.AddIntegerParameter("OpenFillet", "OF", "Open fillet type (0 = Round, 1 = Square, 2 = Butt)", GH_ParamAccess.list, new List<int> { 1 });
+            var cfParamIndex = pManager.AddIntegerParameter("ClosedFillet", "CF", "Closed fillet type (0 = Round, 1 = Square, 2 = Miter)", GH_ParamAccess.list, new List<int> { 1 });
+            var cfParam = pManager[cfParamIndex] as Param_Integer;
+            ParamHelper.AddEnumOptionsToParam<Polyline3D.ClosedFilletType>(cfParam);
+            
+            //public enum OpenFilletType { Round, Square, Butt }
+            var ofParamIndex = pManager.AddIntegerParameter("OpenFillet", "OF", "Open fillet type (0 = Round, 1 = Square, 2 = Butt)", GH_ParamAccess.list, new List<int> { 1 });
+            var ofParam = pManager[ofParamIndex] as Param_Integer;
+            ParamHelper.AddEnumOptionsToParam<Polyline3D.OpenFilletType>(ofParam);
+
             pManager.AddNumberParameter("Miter", "M", "If closed fillet type of Miter is selected: the maximum extension of a curve is Distance * Miter", GH_ParamAccess.item, 2);
         }
 

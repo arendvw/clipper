@@ -5,6 +5,7 @@ using System.Windows.Forms;
 using ClipperLib;
 using GH_IO.Serialization;
 using Grasshopper.Kernel;
+using Grasshopper.Kernel.Parameters;
 using Rhino;
 using Rhino.Geometry;
 using StudioAvw.Clipper.Components.Helpers;
@@ -17,6 +18,7 @@ namespace StudioAvw.Clipper.Components
     /// </summary>
     public class ClipperBooleanComponent : GH_Component
     {
+
         /// <summary>
         /// Initializes a new instance of the C# ScriptComponent class.
         /// </summary>
@@ -36,7 +38,9 @@ namespace StudioAvw.Clipper.Components
             pManager.AddCurveParameter("B", "B", "The first polyline", GH_ParamAccess.list);
             pManager[1].Optional = true;
             // ctIntersection, ctUnion, ctDifference, ctXor };
-            pManager.AddIntegerParameter("BooleanType", "BT", "Type: (0: intersection, 1: union, 2: difference, 3: xor)", GH_ParamAccess.item, 0);
+            var btParamIndex = pManager.AddIntegerParameter("BooleanType", "BT", "Type: (0: intersection, 1: union, 2: difference, 3: xor)", GH_ParamAccess.item, 0);
+            var btParam = pManager[btParamIndex] as Param_Integer;
+            ParamHelper.AddEnumOptionsToParam<BooleanClipType>(btParam);
 
             pManager.AddPlaneParameter("Plane", "Pln", "Plane to project the polylines to", GH_ParamAccess.item, default);
             pManager.AddNumberParameter("Tolerance", "T", "Tolerance: all floating point data beyond this precision will be discarded.", GH_ParamAccess.item, RhinoDoc.ActiveDoc.ModelAbsoluteTolerance);
@@ -179,6 +183,18 @@ namespace StudioAvw.Clipper.Components
         /// Gets the unique ID for this component. Do not change this ID after release.
         /// </summary>
         public override Guid ComponentGuid => new Guid("80ab1de3-d9e2-4c5c-8dc8-9edd5ff30fc9");
+
+        /// <summary>
+        /// Just a wrapper for Clipper's ClipType enum.
+        /// Not strictly necessary but avoids exposing the "ct" prefix to users.
+        /// </summary>
+        public enum BooleanClipType
+        {
+            Intersection,
+            Union,
+            Difference,
+            Xor
+        }
     }
 }
 
