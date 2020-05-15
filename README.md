@@ -56,12 +56,12 @@ Examples can be found on github in the folder [examples]
 
 #### Version
 
-2020-04-20: Version 0.3.2: Added offset type selector, thanks to [Andrew Heumann]
-2020-04-01: Version 0.3.1: Released new version that fixes compatiblity with ShapeDiver
-2019-10-09: Version 0.3.0: Released new version for yak and macrhi. Improved placement in grasshopper menu's
-2019-07-22: Version 0.2.3: Updated to clipper version 6.4.2
-2017-02-15: Version 0.2.2: Update to new clipper version (6 .4.0), release for Rhino WIP
-2014-07-06: Version 0.1, first beta release
+- 2020-04-20: Version 0.3.2: Added offset type selector, thanks to [Andrew Heumann]
+- 2020-04-01: Version 0.3.1: Released new version that fixes compatiblity with ShapeDiver
+- 2019-10-09: Version 0.3.0: Released new version for yak and macrhi. Improved placement in grasshopper menu's
+- 2019-07-22: Version 0.2.3: Updated to clipper version 6.4.2
+- 2017-02-15: Version 0.2.2: Update to new clipper version (6 .4.0), release for Rhino WIP
+- 2014-07-06: Version 0.1, first beta release
 
 #### Credits
 
