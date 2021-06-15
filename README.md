@@ -1,6 +1,8 @@
 Clipper for Grasshopper
 =========
 
+Update June 2021: The last release is from 20th of April 2020. This plugin is stable, and still being maintained.
+
 Clipper is a 2D polygon Clipper offering polygon boolean operations (clipping): Intersection, Join, Difference, XOR. Offsets for polygons and Minkowski Sum and Differences. 
 
 *The good stuff:*
