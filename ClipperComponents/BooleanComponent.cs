@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -78,11 +79,43 @@ namespace StudioAvw.Clipper.Components
                 var polylinesA = Polyline3D.ConvertCurvesToPolyline(curvesA).ToList();
                 var polylinesB = Polyline3D.ConvertCurvesToPolyline(curvesB).ToList();
 
+                // Further tests:
+                // if (polylinesA.Count == 0 && (type == ClipType.ctIntersection || type == ClipType.ctDifference))
+                // {
+                //     da.SetDataList("Result", new List<Polyline> ());
+                //     return;
+                // }
+                //
+                // if (polylinesA.Count == 0 && (type == ClipType.ctXor || type == ClipType.ctUnion))
+                // {
+                //     da.SetDataList("Result", polylinesB);
+                //     return;
+                // }
+                //
+                // if (polylinesB.Count == 0 && (type == ClipType.ctIntersection || type == ClipType.ctDifference))
+                // {
+                //     da.SetDataList("Result", new List<Polyline>());
+                //     return;
+                // }
+
+
                 // If we don't have a plane, let's try to create a plane from the first curve.
                 if (pln.Equals(default) || !pln.IsValid)
                 {
                     // ReSharper disable once PossibleMultipleEnumeration
-                    pln = polylinesA.First().FitPlane();
+                    if (polylinesA.Count != 0)
+                    {
+                        pln = polylinesA.First().FitPlane();
+                    } else if (polylinesB.Count != 0)
+                    {
+                        pln = polylinesB.First().FitPlane();
+                    }
+                    else
+                    {
+                        // both are empty..
+                        da.SetDataList("Result", new List<Polyline>());
+                        return;
+                    }
                 }
 
                 // do the boolean operation
