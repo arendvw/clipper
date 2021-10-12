@@ -12,7 +12,7 @@ namespace StudioAvw.Clipper.Components
 
         public override string Name => "Clipper";
 
-        public override string Version => "0.3.1";
+        public override string Version => "0.3.3";
 
         public override Guid Id => new Guid("{43334b3c-4a74-7648-6ecd-38dfdf4ec67f}");
 
