@@ -83,14 +83,10 @@ namespace StudioAvw.Clipper.Components
             if (InPreSolve)
             {
                 // First pass; collect input data
-                Curve aCurve = new PolylineCurve();
-                Curve bCurve = new PolylineCurve();
-                Plane pln = new Plane();
-                double tolerance = 0.0;
-                data.GetData(0, ref aCurve);
-                data.GetData(1, ref bCurve);
-                data.GetData(2, ref pln);
-                data.GetData(3, ref tolerance);
+                var aCurve= data.Fetch<Curve>(0);
+                var bCurve = data.Fetch<Curve>(1);
+                var pln = data.Fetch<Plane>(2);
+                var tolerance = data.Fetch<double>(3);
 
                 // Queue up the task
                 Task<SolveResults> task = Task.Run(() => Compute(aCurve, bCurve, pln, tolerance), CancelToken);
@@ -101,14 +97,10 @@ namespace StudioAvw.Clipper.Components
             if (!GetSolveResults(data, out SolveResults result))
             {
                 // Compute right here; collect input data
-                Curve aCurve = new PolylineCurve();
-                Curve bCurve = new PolylineCurve();
-                Plane pln = new Plane();
-                double tolerance = 0.0;
-                data.GetData(0, ref aCurve);
-                data.GetData(1, ref bCurve);
-                data.GetData(2, ref pln);
-                data.GetData(3, ref tolerance);
+                var aCurve = data.Fetch<Curve>(0);
+                var bCurve = data.Fetch<Curve>(1);
+                var pln = data.Fetch<Plane>(2);
+                var tolerance = data.Fetch<double>(3);
 
                 // Compute results on given data
                 result = Compute(aCurve, bCurve, pln, tolerance);
