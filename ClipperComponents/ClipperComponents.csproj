@@ -103,10 +103,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Grasshopper">
-      <Version>6.0.18016.23451</Version>
+      <Version>7.5.21100.3001</Version>
     </PackageReference>
     <PackageReference Include="RhinoCommon">
-      <Version>6.0.18016.23451</Version>
+      <Version>7.5.21100.3001</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
