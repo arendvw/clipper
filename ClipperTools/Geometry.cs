@@ -12,6 +12,8 @@ using Rhino.Geometry;
 
 // ReSharper disable once CheckNamespace
 
+using System.Threading.Tasks;
+
 
 namespace StudioAvw.Geometry
 {
@@ -235,7 +237,7 @@ namespace StudioAvw.Geometry
 
             var cOffset = new ClipperOffset(miter, arcTolerance);
             var i = 0;
-            foreach (var pl in polylines)
+            Parallel.ForEach(polylines, pl=>
             {
                 var et = EndType.etOpenButt;
                 var jt = JoinType.jtSquare;
@@ -284,9 +286,12 @@ namespace StudioAvw.Geometry
                 {
                     jt = JoinType.jtSquare;
                 }
-                cOffset.AddPath(pl.ToPath2D(plane, tolerance), jt, et);
-                i++;
-            }
+                lock (cOffset)
+                {
+                    cOffset.AddPath(pl.ToPath2D(plane, tolerance), jt, et);
+                    i++;
+                }
+            });
 
             foreach (var offsetDistance in distance)
             {
