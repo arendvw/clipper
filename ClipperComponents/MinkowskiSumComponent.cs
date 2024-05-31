@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Drawing;
 using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Grasshopper.Kernel;
 using Rhino;
 using Rhino.Geometry;
@@ -12,7 +14,7 @@ namespace StudioAvw.Clipper.Components
     /// <summary>
     /// Creates a CScriptComponent
     /// </summary>
-    public class ClipperMinkowskiSumComponent : GH_Component
+    public class ClipperMinkowskiSumComponent : GH_TaskCapableComponent<ClipperMinkowskiSumComponent.SolveResults>
     {
         /// <summary>
         /// Initializes a new instance of the C# ScriptComponent class.
@@ -44,27 +46,17 @@ namespace StudioAvw.Clipper.Components
             pManager.AddCurveParameter("DisplacedSum", "D", "Minkowski sum curves with displacements of B", GH_ParamAccess.list);
         }
 
-        /// <summary>
-        /// This is the method that actually does the work.
-        /// </summary>
-        /// <param name="da">The DA object is used to retrieve from inputs and store in outputs.</param>
-        protected override void SolveInstance(IGH_DataAccess da)
+        public class SolveResults
+        {
+            public List<Polyline> Value { get; set; }
+        }
+
+        private static SolveResults Compute(Curve aCurve, Curve bCurve, Plane pln, double tolerance)
         {
             // SET ALL INPUT PARAMETERS
-            if (!Polyline3D.ConvertCurveToPolyline(da.Fetch<Curve>("A"), out var plA))
-            {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Unable to convert to polyline from curve");
-                return;
-            }
+            Polyline3D.ConvertCurveToPolyline(aCurve, out var plA);
+            Polyline3D.ConvertCurveToPolyline(bCurve, out var plB);
 
-            if (!Polyline3D.ConvertCurveToPolyline(da.Fetch<Curve>("B"), out var plB))
-            {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Unable to convert to polyline from curve");
-                return;
-            }
-
-            var pln = da.Fetch<Plane>("Plane");
-            var tolerance = da.Fetch<double>("Tolerance");
             if (pln.Equals(default))
             {
                 pln = plA.FitPlane();
@@ -77,10 +69,49 @@ namespace StudioAvw.Clipper.Components
               .Select(path => path.ToPolyline(pln, tolerance, true))
               .ToList();
 
+            SolveResults result = new SolveResults();
+            result.Value = outCurves;
+            return result;
+        }
 
-            // OUTPUT LOGIC
-            da.SetDataList("Sum", outCurves);
-            da.SetDataList("DisplacedSum", outCurves);
+        /// <summary>
+        /// This is the method that actually does the work.
+        /// </summary>
+        /// <param name="data">The DA object is used to retrieve from inputs and store in outputs.</param>
+        protected override void SolveInstance(IGH_DataAccess data)
+        {
+            if (InPreSolve)
+            {
+                // First pass; collect input data
+                var aCurve= data.Fetch<Curve>(0);
+                var bCurve = data.Fetch<Curve>(1);
+                var pln = data.Fetch<Plane>(2);
+                var tolerance = data.Fetch<double>(3);
+
+                // Queue up the task
+                Task<SolveResults> task = Task.Run(() => Compute(aCurve, bCurve, pln, tolerance), CancelToken);
+                TaskList.Add(task);
+                return;
+            }
+
+            if (!GetSolveResults(data, out SolveResults result))
+            {
+                // Compute right here; collect input data
+                var aCurve = data.Fetch<Curve>(0);
+                var bCurve = data.Fetch<Curve>(1);
+                var pln = data.Fetch<Plane>(2);
+                var tolerance = data.Fetch<double>(3);
+
+                // Compute results on given data
+                result = Compute(aCurve, bCurve, pln, tolerance);
+            }
+
+            // Set output data
+            if (result != null)
+            {
+                data.SetDataList("Sum", result.Value);
+                data.SetDataList("DisplacedSum", result.Value);
+            }
         }
 
         /// <summary>

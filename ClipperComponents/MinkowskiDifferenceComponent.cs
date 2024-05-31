@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using Grasshopper.Kernel;
 using Rhino;
 using Rhino.Geometry;
@@ -12,7 +14,7 @@ namespace StudioAvw.Clipper.Components
     /// <summary>
     /// Creates a CScriptComponent
     /// </summary>
-    public class ClipperMinkowskiDiffComponent : GH_Component
+    public class ClipperMinkowskiDiffComponent : GH_TaskCapableComponent<ClipperMinkowskiDiffComponent.SolveResults>
     {
         /// <summary>
         /// Initializes a new instance of the C# ScriptComponent class.
@@ -43,41 +45,72 @@ namespace StudioAvw.Clipper.Components
             pManager.AddCurveParameter("Difference", "D", "Minkowski difference placed relative to A", GH_ParamAccess.list);
         }
 
-        /// <summary>
-        /// This is the method that actually does the work.
-        /// </summary>
-        /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
-        protected override void SolveInstance(IGH_DataAccess DA)
+        public class SolveResults
+        {
+            public List<Polyline> Value { get; set; }
+        }
+
+        private static SolveResults Compute(Curve aCurve, Curve bCurve, Plane pln, double tolerance)
         {
             // SET ALL INPUT PARAMETERS
-            if (!Polyline3D.ConvertCurveToPolyline(DA.Fetch<Curve>("A"), out var plA))
-            {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Unable to convert to polyline from curve");
-                return;
-            }
+            Polyline3D.ConvertCurveToPolyline(aCurve, out var plA);
+            Polyline3D.ConvertCurveToPolyline(bCurve, out var plB);
 
-            if (!Polyline3D.ConvertCurveToPolyline(DA.Fetch<Curve>("B"), out var plB))
-            {
-                AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Unable to convert to polyline from curve");
-                return;
-            }
-
-            var pln = DA.Fetch<Plane>("Plane");
-            var tolerance = DA.Fetch<double>("Tolerance");
             if (pln.Equals(default))
             {
                 pln = plA.FitPlane();
             }
 
-            var outCurves = new List<Polyline>();
-            foreach (var path in ClipperLib.Clipper.MinkowskiDiff(plA.ToPath2D(pln, tolerance), plB.ToPath2D(pln, tolerance)))
+            var outCurves = ClipperLib.Clipper.MinkowskiDiff(
+              plA.ToPath2D(pln, tolerance),
+              plB.ToPath2D(pln, tolerance)
+              )
+              .Select(path => path.ToPolyline(pln, tolerance, true))
+              .ToList();
+
+            SolveResults result = new SolveResults();
+            result.Value = outCurves;
+            return result;
+        }
+
+        /// <summary>
+        /// This is the method that actually does the work.
+        /// </summary>
+        /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
+        protected override void SolveInstance(IGH_DataAccess data)
+        {
+            if (InPreSolve)
             {
-                var plSum = path.ToPolyline(pln, tolerance, true);
-                outCurves.Add(plSum);
+                // First pass; collect input data
+                var aCurve = data.Fetch<Curve>(0);
+                var bCurve = data.Fetch<Curve>(1);
+                var pln = data.Fetch<Plane>(2);
+                var tolerance = data.Fetch<double>(3);
+
+                // Queue up the task
+                Task<SolveResults> task = Task.Run(() => Compute(aCurve, bCurve, pln, tolerance), CancelToken);
+                TaskList.Add(task);
+                return;
             }
-            
-            // OUTPUT LOGIC
-            DA.SetDataList("Difference", outCurves);
+
+            if (!GetSolveResults(data, out SolveResults result))
+            {
+                // Compute right here; collect input data
+                var aCurve = data.Fetch<Curve>(0);
+                var bCurve = data.Fetch<Curve>(1);
+                var pln = data.Fetch<Plane>(2);
+                var tolerance = data.Fetch<double>(3);
+
+                // Compute results on given data
+                result = Compute(aCurve, bCurve, pln, tolerance);
+            }
+
+            // Set output data
+            if (result != null)
+            {
+                data.SetDataList("Sum", result.Value);
+                data.SetDataList("DisplacedSum", result.Value);
+            }
         }
         /// <summary>
         /// Icon
