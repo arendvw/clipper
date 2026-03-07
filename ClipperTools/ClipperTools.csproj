@@ -7,6 +7,7 @@
     <Copyright>Copyright © Angus Johnson 2010-2015 / Modification by Arend van Waart</Copyright>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Clipper2" />
     <PackageReference Include="RhinoCommon" ExcludeAssets="runtime"/>
   </ItemGroup>
 </Project>

@@ -1,5 +1,6 @@
 <Project>
     <PropertyGroup>
+        <LangVersion>10</LangVersion>
         <Version>2.0.0</Version>
         <Copyright>Arend van Waart</Copyright>
         <Company>StudioAvw</Company>

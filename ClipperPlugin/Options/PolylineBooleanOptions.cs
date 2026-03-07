@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ClipperLib;
 using ClipperPlugin.Commands;
+using ClipperTools.Clipper1;
 using Rhino;
 using Rhino.Geometry;
 using Rhino.Input.Custom;

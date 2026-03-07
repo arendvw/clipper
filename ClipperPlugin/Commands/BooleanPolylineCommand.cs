@@ -3,6 +3,7 @@
 using System.Linq;
 using System.Runtime.InteropServices;
 using ClipperPlugin.Options;
+using ClipperTools.Clipper1;
 using Rhino;
 using Rhino.Commands;
 using Rhino.DocObjects;
