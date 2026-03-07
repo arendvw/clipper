@@ -1,29 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using ClipperTools.Clipper1;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using StudioAvw.Clipper.Components.Helpers;
 
-namespace StudioAvw.Clipper.Components.Components.Clipper1;
+namespace StudioAvw.Clipper.Components.Clipper1;
 
 /// <summary>
 /// Creates a CScriptComponent
 /// </summary>
-public class ClipperMinkowskiDiffComponent : GH_Component
+public class ClipperMinkowskiSumComponent : GH_Component
 {
     /// <summary>
     /// Initializes a new instance of the C# ScriptComponent class.
     /// </summary>
-    public ClipperMinkowskiDiffComponent()
-        : base("Minkowski Difference", "MinkowskiDiff", "Calculate the minkowski difference of two Polylines using Clipper", "Clipper", "Polyline")
+    public ClipperMinkowskiSumComponent()
+        : base("Minkowski Sum", "MinkowskiSum", "Calculate the minkowski sum of two polygons using Clipper", "Clipper", "Polyline")
     {
     }
 
     /// <summary>
     /// Registers all the input parameters for this component.
     /// </summary>
+    /// <param name="pManager">Use the pManager to register new parameters. pManager is never null.</param>
     protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
         pManager.AddCurveParameter("A", "A", "The first polyline", GH_ParamAccess.item);
@@ -35,56 +36,60 @@ public class ClipperMinkowskiDiffComponent : GH_Component
     /// <summary>
     /// Registers all the output parameters for this component.
     /// </summary>
-
+    /// <param name="pManager">Use the pManager to register new parameters. pManager is never null.</param>
     protected override void RegisterOutputParams(GH_OutputParamManager pManager)
     {
-
-        pManager.AddCurveParameter("Difference", "D", "Minkowski difference placed relative to A", GH_ParamAccess.list);
+        pManager.AddCurveParameter("Sum", "S", "Minkowski sum placed relative to A", GH_ParamAccess.list);
+        pManager.AddCurveParameter("DisplacedSum", "D", "Minkowski sum curves with displacements of B", GH_ParamAccess.list);
     }
 
     /// <summary>
     /// This is the method that actually does the work.
     /// </summary>
-    /// <param name="DA">The DA object is used to retrieve from inputs and store in outputs.</param>
-    protected override void SolveInstance(IGH_DataAccess DA)
+    /// <param name="da">The DA object is used to retrieve from inputs and store in outputs.</param>
+    protected override void SolveInstance(IGH_DataAccess da)
     {
         // SET ALL INPUT PARAMETERS
-        if (!Polyline3D.ConvertCurveToPolyline(DA.Fetch<Curve>("A"), out var plA))
+        if (!Polyline3D.ConvertCurveToPolyline(da.Fetch<Curve>("A"), out var plA))
         {
             AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Unable to convert to polyline from curve");
             return;
         }
 
-        if (!Polyline3D.ConvertCurveToPolyline(DA.Fetch<Curve>("B"), out var plB))
+        if (!Polyline3D.ConvertCurveToPolyline(da.Fetch<Curve>("B"), out var plB))
         {
             AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Unable to convert to polyline from curve");
             return;
         }
 
-        var pln = DA.Fetch<Plane>("Plane");
-        var tolerance = DA.Fetch<double>("Tolerance");
+        var pln = da.Fetch<Plane>("Plane");
+        var tolerance = da.Fetch<double>("Tolerance");
         if (pln.Equals(default))
         {
             pln = plA.FitPlane();
         }
 
-        var outCurves = new List<Polyline>();
-        foreach (var path in ClipperTools.Clipper1.Clipper.MinkowskiDiff(plA.ToPath2D(pln, tolerance), plB.ToPath2D(pln, tolerance)))
-        {
-            var plSum = path.ToPolyline(pln, tolerance, true);
-            outCurves.Add(plSum);
-        }
-            
+        var outCurves = ClipperTools.Clipper1.Clipper.MinkowskiSum(
+                plA.ToPath2D(pln, tolerance),
+                plB.ToPath2D(pln, tolerance),
+                true)
+            .Select(path => path.ToPolyline(pln, tolerance, true))
+            .ToList();
+
+
         // OUTPUT LOGIC
-        DA.SetDataList("Difference", outCurves);
+        da.SetDataList("Sum", outCurves);
+        da.SetDataList("DisplacedSum", outCurves);
     }
+
     /// <summary>
-    /// Icon
+    /// Provides an Icon for the component.
     /// </summary>
-    protected override Bitmap Icon => Icons.Icon_MinkowskiDiff;
+
+    protected override Bitmap Icon => Icons.Icon_Minkowski;
 
     /// <summary>
     /// Gets the unique ID for this component. Do not change this ID after release.
     /// </summary>
-    public override Guid ComponentGuid => new Guid("{C7A39F41-798C-43C3-86CD-8E06547BA4CB}");
+    public override Guid ComponentGuid => new Guid("{9C15D429-8249-4D36-94DF-5552E21B2BA1}");
 }

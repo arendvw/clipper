@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Rhino;
 using Rhino.Geometry;
-using StudioAvw.Geometry;
+using ClipperTools.Clipper1;
 
 namespace ClipperTools.Clipper1;
 

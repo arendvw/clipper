@@ -5,7 +5,6 @@ using ClipperTools.Clipper1;
 using Rhino;
 using Rhino.Geometry;
 using Rhino.Input.Custom;
-using StudioAvw.Geometry;
 
 namespace ClipperPlugin.Options
 {

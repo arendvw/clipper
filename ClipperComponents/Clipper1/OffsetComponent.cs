@@ -8,7 +8,7 @@ using Grasshopper.Kernel.Parameters;
 using Rhino.Geometry;
 using StudioAvw.Clipper.Components.Helpers;
 
-namespace StudioAvw.Clipper.Components.Components.Clipper1;
+namespace StudioAvw.Clipper.Components.Clipper1;
 
 /// <summary>
 /// Creates a CScriptComponent

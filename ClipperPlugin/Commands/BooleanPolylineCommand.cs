@@ -8,7 +8,6 @@ using Rhino;
 using Rhino.Commands;
 using Rhino.DocObjects;
 using Rhino.Input;
-using StudioAvw.Geometry;
 
 #endregion
 

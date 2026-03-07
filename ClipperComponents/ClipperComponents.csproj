@@ -20,4 +20,8 @@
     <ProjectReference Include="..\ClipperTools\ClipperTools.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Components\" />
+  </ItemGroup>
+
 </Project>

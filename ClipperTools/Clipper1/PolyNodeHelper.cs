@@ -1,15 +1,6 @@
-﻿#region
+﻿using System.Collections.Generic;
 
-using System.Collections.Generic;
-using ClipperTools.Clipper1;
-
-#endregion
-
-
-// ReSharper disable once CheckNamespace
-
-
-namespace StudioAvw.Geometry;
+namespace ClipperTools.Clipper1;
 
 /// <summary>
 /// /// This file contains the glue to connect the Clipper library to RhinoCommon
