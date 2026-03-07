@@ -1,0 +1,10 @@
+<Project>
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageVersion Include="RhinoCommon" Version="7.38.24338.17001" />
+        <PackageVersion Include="Grasshopper" Version="7.38.24338.17001" />
+        <PackageVersion Include="System.Resources.Extensions" Version="8.0.0" />
+    </ItemGroup>
+</Project>

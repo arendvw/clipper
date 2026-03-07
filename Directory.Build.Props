@@ -6,5 +6,6 @@
         <Authors>Arend van Waart, Angus Johnson</Authors>
         <Description>Provides polyline offset and boolean capabilities to Rhino</Description>
         <PackageLicenseExpression>BSL-1.0</PackageLicenseExpression>
+        <NoWarn>$(NoWarn);NU1507</NoWarn>
     </PropertyGroup>
 </Project>
