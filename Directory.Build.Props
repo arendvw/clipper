@@ -1,0 +1,10 @@
+<Project>
+    <PropertyGroup>
+        <Version>2.0.0</Version>
+        <Copyright>Arend van Waart</Copyright>
+        <Company>StudioAvw</Company>
+        <Authors>Arend van Waart, Angus Johnson</Authors>
+        <Description>Provides polyline offset and boolean capabilities to Rhino</Description>
+        <PackageLicenseExpression>BSL-1.0</PackageLicenseExpression>
+    </PropertyGroup>
+</Project>

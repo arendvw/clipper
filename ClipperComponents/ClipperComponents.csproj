@@ -1,127 +1,23 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{60336726-833B-4C4E-86D8-7EEAE16D5F77}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFramework>net48</TargetFramework>
     <RootNamespace>StudioAvw.Clipper.Components</RootNamespace>
     <AssemblyName>ClipperComponents</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
+    <TargetExt>.gha</TargetExt>
+    <UseWindowsForms>true</UseWindowsForms>
+    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>7.1</LangVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
-    <LangVersion>7.1</LangVersion>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <PackageReference Include="System.Resources.Extensions" Version="8.0.0" ExcludeAssets="runtime" />
+    <PackageReference Include="Grasshopper" Version="7.0.20314.3001" ExcludeAssets="runtime" />
+    <PackageReference Include="RhinoCommon" Version="7.0.20314.3001" ExcludeAssets="runtime" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="BooleanComponent.cs" />
-    <Compile Include="Helpers\DataAccessHelper.cs" />
-    <Compile Include="Helpers\ParamHelper.cs" />
-    <Compile Include="Helpers\DocHelper.cs" />
-    <Compile Include="Icons.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Icons.resx</DependentUpon>
-    </Compile>
-    <Compile Include="MinkowskiDifferenceComponent.cs" />
-    <Compile Include="MinkowskiSumComponent.cs" />
-    <Compile Include="OffsetComponent.cs" />
-    <Compile Include="PolygonContainmentComponent.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-      <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
+    <ProjectReference Include="..\ClipperTools\ClipperTools.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ClipperTools\ClipperTools.csproj">
-      <Project>{79efb8b2-9ae3-429c-a254-58d1603f118f}</Project>
-      <Name>ClipperTools</Name>
-      <Private>True</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Icons.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Icons.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Icons\Icon_CurveBoolean.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Icons\Icon_Minkowski.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Icons\Icon_Offset.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Icons\Icon_PointInside.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
-    <None Include="Resources\Icon_Offset.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Icons\Icon_MinkowskiDiff.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Grasshopper">
-      <Version>0.9.76</Version>
-    </PackageReference>
-    <PackageReference Include="RhinoCommon">
-      <Version>5.12.50810.13095</Version>
-    </PackageReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>Copy "$(TargetPath)" "$(TargetDir)$(ProjectName).gha"
-Erase "$(TargetPath)"
-Erase "$(TargetDir)RhinoCommon.dll"
-Erase "$(TargetDir)Grasshopper.dll"
-Erase "$(TargetDir)GH_IO.dll"</PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
+
 </Project>

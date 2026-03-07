@@ -4,7 +4,7 @@
 dist
 release
 yak.exe
-
+.idea/*
 # User-specific files
 *.suo
 *.user
