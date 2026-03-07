@@ -1,8 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using ClipperTools;
-using ClipperTools.Clipper1;
+using clipper_lib;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using StudioAvw.Clipper.Components.Helpers;
@@ -12,13 +13,13 @@ namespace StudioAvw.Clipper.Components.Clipper1;
 /// <summary>
 /// Creates a CScriptComponent
 /// </summary>
-public class ClipperMinkowskiSumComponent : GH_Component
+public class ClipperMinkowskiSumComponent : BaseComponent
 {
     /// <summary>
     /// Initializes a new instance of the C# ScriptComponent class.
     /// </summary>
     public ClipperMinkowskiSumComponent()
-        : base("Minkowski Sum", "MinkowskiSum", "Calculate the minkowski sum of two polygons using Clipper", "Clipper", "Polyline")
+        : base("Minkowski Sum", "MinkowskiSum", "Calculate the minkowski sum of two polygons using Clipper")
     {
     }
 
@@ -67,21 +68,23 @@ public class ClipperMinkowskiSumComponent : GH_Component
         var tolerance = da.Fetch<double>("Tolerance");
         if (pln.Equals(default))
         {
-            pln = GenericTools.FitPlane(plA);
+            pln = plA.FitPlane();
         }
-
-        var outCurves = ClipperTools.Clipper1.Clipper.MinkowskiSum(
-                plA.ToPath2D(pln, tolerance),
-                plB.ToPath2D(pln, tolerance),
-                true)
-            .Select(path => path.ToPolyline(pln, tolerance, true))
-            .ToList();
+        
+        var outCurves = Version switch
+        {
+            ClipperVersion.Clipper1 => ClipperTools.Clipper1.Polyline3D.MinkowskiSum(plA, plB, pln, tolerance),
+            ClipperVersion.Clipper2 => ClipperTools.Clipper2.Polyline3D.MinkowskiSum(plA, plB, pln, tolerance),
+            _ => throw new ArgumentOutOfRangeException()
+        };
 
 
         // OUTPUT LOGIC
         da.SetDataList("Sum", outCurves);
         da.SetDataList("DisplacedSum", outCurves);
     }
+
+
 
     /// <summary>
     /// Provides an Icon for the component.

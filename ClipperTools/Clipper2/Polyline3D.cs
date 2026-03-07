@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Clipper2Lib;
-using ClipperTools.Clipper1;
+using clipper_lib;
 using Rhino;
 using Rhino.Geometry;
 using Clipper = Clipper2Lib.Clipper;
@@ -80,11 +80,20 @@ public static class Polyline3D
     /// <param name="pln">The PLN.</param>
     /// <param name="tolerance">The tolerance.</param>
     /// <returns></returns>
-    public static PointInPolygonResult IsInside(this Polyline polyline, Point3d point, Plane pln, Double tolerance)
+    public static int IsInside(this Polyline polyline, Point3d point, Plane pln, double tolerance)
     {
-        return Clipper.PointInPolygon(point.ToPoint642D(pln, tolerance), new Path64(polyline.ToPath2D(pln, tolerance)));
-    }
+        var result = Clipper2Lib.Clipper.PointInPolygon(
+            point.ToPoint642D(pln, tolerance),
+            polyline.ToPath2D(pln, tolerance));
 
+        return result switch
+        {
+            Clipper2Lib.PointInPolygonResult.IsInside => 1,
+            Clipper2Lib.PointInPolygonResult.IsOn => -1,
+            Clipper2Lib.PointInPolygonResult.IsOutside => 0,
+            _ => 0
+        };
+    }
     /// <summary>
     /// Offsets the specified polylines.
     /// </summary>
@@ -202,10 +211,20 @@ public static class Polyline3D
             outHoles.Add(holes);
         }
     }
+    private static ClipType MapToClipper2ClipType(GenericTools.BooleanClipType type) => type switch
+    {
+        GenericTools.BooleanClipType.Intersection => Clipper2Lib.ClipType.Intersection,
+        GenericTools.BooleanClipType.Union => Clipper2Lib.ClipType.Union,
+        GenericTools.BooleanClipType.Difference => Clipper2Lib.ClipType.Difference,
+        GenericTools.BooleanClipType.Xor => Clipper2Lib.ClipType.Xor,
+        GenericTools.BooleanClipType.NoClip => Clipper2Lib.ClipType.NoClip,
 
-    public static List<Polyline> Boolean(ClipType clipType, IEnumerable<Polyline> polyA, IEnumerable<Polyline> polyB,
+        _ => throw new ArgumentOutOfRangeException(nameof(type))
+    };
+    public static List<Polyline> Boolean(GenericTools.BooleanClipType clipTypeIn, IEnumerable<Polyline> polyA, IEnumerable<Polyline> polyB,
         Plane pln, double tolerance, bool evenOddFilling)
     {
+        var clipType = MapToClipper2ClipType(clipTypeIn);
         var clipper = new Clipper64();
         var fillRule = evenOddFilling ? FillRule.EvenOdd : FillRule.NonZero;
 
@@ -307,5 +326,66 @@ public static class Polyline3D
         pln.ClosestParameter(pt, out var s, out var t);
         var point = new Point64(s / tolerance, t / tolerance);
         return point;
+    }
+    
+    public static List<Polyline> MinkowskiSum(Polyline plA, Polyline plB, Plane pln, double tolerance)
+    {
+        var outCurves = Clipper2Lib.Clipper.MinkowskiSum(
+                plA.ToPath2D(pln, tolerance),
+                plB.ToPath2D(pln, tolerance),
+                true)
+            .Select(path => path.ToPolyline(pln, tolerance, true))
+            .ToList();
+        return outCurves;
+    }
+    
+    public static List<Polyline> MinkowskiDiff(Polyline plA, Polyline plB, Plane pln, double tolerance)
+    {
+        var outCurves = new List<Polyline>();
+        foreach (var path in Clipper2Lib.Clipper.MinkowskiDiff(plA.ToPath2D(pln, tolerance), plB.ToPath2D(pln, tolerance), plA.IsClosed))
+        {
+            outCurves.Add(path.ToPolyline(pln, tolerance, true));
+        }
+        return outCurves;
+    }
+    
+    public static List<Polyline> RectClip(List<Polyline> polylines, Rectangle3d rect, double tolerance)
+    {
+        var pln = rect.Plane;
+
+        // Rectangle corners in local plane coords
+        var c0 = rect.Corner(0);
+        var c2 = rect.Corner(2);
+
+        pln.RemapToPlaneSpace(c0, out var local0);
+        pln.RemapToPlaneSpace(c2, out var local2);
+
+        var clipRect = new Rect64(
+            (long)(Math.Min(local0.X, local2.X) / tolerance),
+            (long)(Math.Min(local0.Y, local2.Y) / tolerance),
+            (long)(Math.Max(local0.X, local2.X) / tolerance),
+            (long)(Math.Max(local0.Y, local2.Y) / tolerance));
+
+        var subjects = new Paths64();
+        foreach (var pl in polylines)
+        {
+            subjects.Add(pl.ToPath2D(pln, tolerance));
+        }
+
+        var solution = Clipper2Lib.Clipper.RectClip(clipRect, subjects);
+
+        return solution
+            .Select(path => path.ToPolyline(pln, tolerance, true))
+            .ToList();
+    }
+    
+    public static Polyline Simplify(Polyline polyline, Plane pln, double tolerance, double epsilon)
+    {
+        var path = polyline.ToPath2D(pln, tolerance);
+        var simplified = Clipper2Lib.Clipper.SimplifyPaths(
+            new Paths64 { path },
+            epsilon / tolerance,
+            polyline.IsClosed);
+        return simplified.First().ToPolyline(pln, tolerance, polyline.IsClosed);
     }
 }

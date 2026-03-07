@@ -1,10 +1,11 @@
 ﻿#region
 
+using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using ClipperPlugin.Options;
 using ClipperTools;
-using ClipperTools.Clipper1;
+using clipper_lib;
 using Rhino;
 using Rhino.Commands;
 using Rhino.DocObjects;
@@ -111,13 +112,22 @@ namespace ClipperPlugin.Commands
             doc.Objects.Select(guids);
             return Result.Success;
         }
+        internal static GenericTools.BooleanClipType ToBooleanClipType(CommandBooleanType type) => type switch
+        {
+            CommandBooleanType.Intersection => GenericTools.BooleanClipType.Intersection,
+            CommandBooleanType.Union => GenericTools.BooleanClipType.Union,
+            CommandBooleanType.Difference => GenericTools.BooleanClipType.Difference,
+            CommandBooleanType.Xor => GenericTools.BooleanClipType.Xor,
+            CommandBooleanType.MassUnion => GenericTools.BooleanClipType.Union,
+            _ => throw new ArgumentOutOfRangeException(nameof(type))
+        };
     }
 
     /// <summary>
     /// Boolean options that are available. These options are used for readability, and translate directly to the ClipperLib.ClipType enum
     /// The MassUnion Option is used seperately in this document.
     /// </summary>
-    enum BooleanType
+    enum CommandBooleanType
     {
         Intersection,
         Union,

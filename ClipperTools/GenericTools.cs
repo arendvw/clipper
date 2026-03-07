@@ -93,4 +93,13 @@ public static class GenericTools
         }
         return pl.IsValid && !(pl.Length < RhinoMath.ZeroTolerance);
     }
+
+    public enum BooleanClipType
+    {
+        Intersection,
+        Union,
+        Difference,
+        Xor,
+        NoClip
+    }
 }

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using ClipperTools;
-using ClipperTools.Clipper1;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using StudioAvw.Clipper.Components.Helpers;
@@ -12,13 +11,13 @@ namespace StudioAvw.Clipper.Components.Clipper1;
 /// <summary>
 /// Creates a CScriptComponent
 /// </summary>
-public class ClipperMinkowskiDiffComponent : GH_Component
+public class ClipperMinkowskiDiffComponent : BaseComponent
 {
     /// <summary>
     /// Initializes a new instance of the C# ScriptComponent class.
     /// </summary>
-    public ClipperMinkowskiDiffComponent()
-        : base("Minkowski Difference", "MinkowskiDiff", "Calculate the minkowski difference of two Polylines using Clipper", "Clipper", "Polyline")
+    public ClipperMinkowskiDiffComponent() 
+        : base("Minkowski Difference", "MinkowskiDiff", "Calculate the minkowski difference of two Polylines using Clipper")
     {
     }
 
@@ -66,15 +65,15 @@ public class ClipperMinkowskiDiffComponent : GH_Component
         var tolerance = DA.Fetch<double>("Tolerance");
         if (pln.Equals(default))
         {
-            pln = GenericTools.FitPlane(plA);
+            pln = plA.FitPlane();
         }
 
-        var outCurves = new List<Polyline>();
-        foreach (var path in ClipperTools.Clipper1.Clipper.MinkowskiDiff(plA.ToPath2D(pln, tolerance), plB.ToPath2D(pln, tolerance)))
+        var outCurves = Version switch
         {
-            var plSum = path.ToPolyline(pln, tolerance, true);
-            outCurves.Add(plSum);
-        }
+            ClipperVersion.Clipper1 => ClipperTools.Clipper1.Polyline3D.MinkowskiDiff(plA, plB, pln, tolerance),
+            ClipperVersion.Clipper2 => ClipperTools.Clipper2.Polyline3D.MinkowskiDiff(plA, plB, pln, tolerance),
+            _ => throw new ArgumentOutOfRangeException()
+        };
             
         // OUTPUT LOGIC
         DA.SetDataList("Difference", outCurves);

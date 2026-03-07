@@ -2,6 +2,7 @@
 using System.Linq;
 using ClipperPlugin.Commands;
 using ClipperTools;
+using clipper_lib;
 using ClipperTools.Clipper1;
 using Rhino;
 using Rhino.Geometry;

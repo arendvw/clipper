@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using clipper_lib;
 using Rhino.Geometry;
 
 namespace ClipperTools.Clipper1;

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using ClipperPlugin.Commands;
+using clipper_lib;
+using ClipperTools;
 using ClipperTools.Clipper1;
 using Rhino;
 using Rhino.Geometry;
@@ -64,7 +66,7 @@ namespace ClipperPlugin.Options
         /// <summary>
         /// Boolean type of the current boolean operation
         /// </summary>
-        public BooleanType BooleanType => (BooleanType)GetEnumValue("BooleanType");
+        public CommandBooleanType CommandBooleanType => (CommandBooleanType)GetEnumValue("BooleanType");
 
         /// <summary>
         /// Filling rule: Even/Odd or Non-Zero?
@@ -83,7 +85,7 @@ namespace ClipperPlugin.Options
             _tolerance = new OptionDouble(absoluteTolerance/10, RhinoMath.ZeroTolerance, double.MaxValue);
             _dynamicPreviewToggle = new OptionToggle(!isScripted, "Disabled","Enabled");
             _evenOdd = new OptionToggle(true, "NonZero", "evenOdd");
-            AddOptionEnum("BooleanType", BooleanType.Difference);
+            AddOptionEnum("BooleanType", CommandBooleanType.Difference);
             AddOptionEnum("ProjectTo", ProjectToCplane.CPlane);
             AddOptionDouble("Tolerance", ref _tolerance, "Tolerance");
             AddOptionToggle("DynamicPreview", ref _dynamicPreviewToggle);
@@ -103,9 +105,9 @@ namespace ClipperPlugin.Options
                 Plane.FitPlaneToPoints(_curvesA.First(), out pln);
             }
 
-            if (!BooleanType.Equals(BooleanType.MassUnion))
+            if (!CommandBooleanType.Equals(CommandBooleanType.MassUnion))
             {
-                _result = Polyline3D.Boolean((ClipType) (int) BooleanType, _curvesA, _curvesB, pln, Tolerance, EvenOdd);
+                _result = Polyline3D.Boolean(BooleanPolylineCommand.ToBooleanClipType(CommandBooleanType), _curvesA, _curvesB, pln, Tolerance, EvenOdd);
             }
             else
             {
@@ -116,7 +118,7 @@ namespace ClipperPlugin.Options
                 // ReSharper disable once PossibleMultipleEnumeration LoopCanBeConvertedToQuery
                 foreach (var curve in allCurves.Skip(1))
                 {
-                    result = Polyline3D.Boolean(ClipType.ctUnion, result, new List<Polyline> {curve}, pln, Tolerance, false);
+                    result = Polyline3D.Boolean(GenericTools.BooleanClipType.Union, result, new List<Polyline> {curve}, pln, Tolerance, false);
                 }
                 _result = result;
             }
@@ -176,11 +178,8 @@ namespace ClipperPlugin.Options
         /// </summary>
         internal void ToggleBoolean()
         {
-            int currentItem = (int) BooleanType;
+            int currentItem = (int) CommandBooleanType;
             var newCurrentItem = (currentItem + 1)%4;
-            
-            RhinoApp.WriteLine("Showing current boolean type: {0}, Old: {1}, New: {2}", (BooleanType) newCurrentItem, currentItem, newCurrentItem);
-            RhinoApp.WriteLine("New booleanType {0} {1}", BooleanType, (int) BooleanType);
             SetEnumValue("BooleanType", newCurrentItem);
             CalculateBoolean();
         }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Drawing;
 using ClipperTools;
-using ClipperTools.Clipper1;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
 using StudioAvw.Clipper.Components.Helpers;
@@ -11,14 +10,14 @@ namespace StudioAvw.Clipper.Components.Clipper1;
 /// <summary>
 /// Creates a CScriptComponent
 /// </summary>
-public class ClipperPolygonInsideComponent : GH_Component
+public class ClipperPolygonInsideComponent : BaseComponent
 {
     /// <summary>
     /// Initializes a new instance of the C# ScriptComponent class.
     /// </summary>
     /// <exclude />
     public ClipperPolygonInsideComponent()
-        : base("Polyline Containment", "PolyContain", "Tests if a point is inside a Polyline using Clipper", "Clipper", "Polyline")
+        : base("Polyline Containment", "PolyContain", "Tests if a point is inside a Polyline using Clipper")
     {
     }
 
@@ -60,10 +59,16 @@ public class ClipperPolygonInsideComponent : GH_Component
 
         if (pln.Equals(default))
         {
-            pln = GenericTools.FitPlane(plA);
+            pln = plA.FitPlane();
         }
+        var inside = Version switch
+        {
+            ClipperVersion.Clipper1 => ClipperTools.Clipper1.Polyline3D.IsInside(plA, pt, pln, tolerance),
+            ClipperVersion.Clipper2 => ClipperTools.Clipper2.Polyline3D.IsInside(plA, pt, pln, tolerance),
+            _ => throw new ArgumentOutOfRangeException()
+        };
 
-        da.SetData("Inside", plA.IsInside(pt, pln, tolerance));
+        da.SetData("Inside", inside);
     }
 
     /// <summary>

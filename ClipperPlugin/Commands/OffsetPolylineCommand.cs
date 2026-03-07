@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using ClipperPlugin.Options;
 using ClipperTools;
-using ClipperTools.Clipper1;
+using clipper_lib;
 using Rhino;
 using Rhino.Commands;
 using Rhino.DocObjects;

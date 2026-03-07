@@ -103,8 +103,19 @@ public class OffsetComponent : BaseComponent
             return;
         }
 
-        Polyline3D.Offset(polylines, openType, closedType, pln, tolerance, new List<double> { dist }, miter, 0.25, out var outside, out var holes);
-        
+        List<List<Polyline>> outside;
+        List<List<Polyline>> holes;
+        switch (Version)
+        {
+            case ClipperVersion.Clipper1:
+                Polyline3D.Offset(polylines, openType, closedType, pln, tolerance, new List<double> { dist }, miter, 0.25, out outside, out holes);
+                break;
+            case ClipperVersion.Clipper2:
+                ClipperTools.Clipper2.Polyline3D.Offset(polylines, openType, closedType, pln, tolerance, new List<double> { dist }, miter, 0.25, out outside, out holes);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
         // OUTPUT LOGIC
         da.SetDataList("Contour", outside.First());
         da.SetDataList("Holes", holes.First());

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using clipper_lib;
 using Rhino;
 using Rhino.Geometry;
-using ClipperTools.Clipper1;
 
 namespace ClipperTools.Clipper1;
 
@@ -201,11 +201,19 @@ public static class Polyline3D
             outHoles.Add(holes);
         }
     }
+    private static ClipType MapToClipper1ClipType(GenericTools.BooleanClipType type) => type switch
+    {
+        GenericTools.BooleanClipType.Intersection => ClipType.ctIntersection,
+        GenericTools.BooleanClipType.Union => ClipType.ctUnion,
+        GenericTools.BooleanClipType.Difference => ClipType.ctDifference,
+        GenericTools.BooleanClipType.Xor => ClipType.ctXor,
+        _ => throw new ArgumentOutOfRangeException(nameof(type))
+    };
 
-
-    public static List<Polyline> Boolean(ClipType clipType, IEnumerable<Polyline> polyA, IEnumerable<Polyline> polyB,
+    public static List<Polyline> Boolean(GenericTools.BooleanClipType inClipType, IEnumerable<Polyline> polyA, IEnumerable<Polyline> polyB,
         Plane pln, double tolerance, bool evenOddFilling)
     {
+        var clipType = MapToClipper1ClipType(inClipType);
         var clipper = new Clipper();
         var polyfilltype = PolyFillType.pftEvenOdd;
         if (!evenOddFilling)
@@ -302,5 +310,27 @@ public static class Polyline3D
         pln.ClosestParameter(pt, out var s, out var t);
         var point = new IntPoint(s / tolerance, t / tolerance);
         return point;
+    }
+
+    public static List<Polyline> MinkowskiSum(Polyline plA, Polyline plB, Plane pln, double tolerance)
+    {
+        var outCurves = clipper_lib.Clipper.MinkowskiSum(
+                plA.ToPath2D(pln, tolerance),
+                plB.ToPath2D(pln, tolerance),
+                true)
+            .Select(path => path.ToPolyline(pln, tolerance, true))
+            .ToList();
+        return outCurves;
+    }
+    public static List<Polyline> MinkowskiDiff(Polyline plA, Polyline plB, Plane pln, double tolerance)
+    {
+        var outCurves = new List<Polyline>();
+        foreach (var path in clipper_lib.Clipper.MinkowskiDiff(
+                     plA.ToPath2D(pln, tolerance),
+                     plB.ToPath2D(pln, tolerance)))
+        {
+            outCurves.Add(path.ToPolyline(pln, tolerance, true));
+        }
+        return outCurves;
     }
 }

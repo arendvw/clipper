@@ -56,7 +56,7 @@ using System.Collections.Generic;
 //using System.IO;            //debugging with streamReader & StreamWriter
 //using System.Windows.Forms; //debugging to clipboard
 
-namespace ClipperTools.Clipper1
+namespace clipper_lib
 {
 
 #if use_int32

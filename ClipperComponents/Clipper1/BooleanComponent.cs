@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using ClipperTools;
-using ClipperTools.Clipper1;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Parameters;
 using Rhino.Geometry;
@@ -26,7 +25,7 @@ public class ClipperBooleanComponent : BaseComponent
         pManager[1].Optional = true;
         var btParamIndex = pManager.AddIntegerParameter("BooleanType", "BT", "Type: (0: intersection, 1: union, 2: difference, 3: xor)", GH_ParamAccess.item, 0);
         var btParam = pManager[btParamIndex] as Param_Integer;
-        ParamHelper.AddEnumOptionsToParam<BooleanClipType>(btParam);
+        ParamHelper.AddEnumOptionsToParam<GenericTools.BooleanClipType>(btParam);
 
         pManager.AddPlaneParameter("Plane", "Pln", "Plane to project the polylines to", GH_ParamAccess.item, default);
         pManager.AddNumberParameter("Tolerance", "T", "Tolerance: all floating point data beyond this precision will be discarded.", GH_ParamAccess.item, DocHelper.GetModelTolerance());
@@ -43,7 +42,7 @@ public class ClipperBooleanComponent : BaseComponent
         var curvesB = da.FetchList<Curve>("B");
         try
         {
-            var boolType = (BooleanClipType)da.Fetch<int>("BooleanType");
+            var boolType = (GenericTools.BooleanClipType)da.Fetch<int>("BooleanType");
             var pln = da.Fetch<Plane>("Plane");
             var tolerance = da.Fetch<double>("Tolerance");
 
@@ -67,10 +66,10 @@ public class ClipperBooleanComponent : BaseComponent
             switch (Version)
             {
                 case ClipperVersion.Clipper1:
-                    result = ClipperTools.Clipper1.Polyline3D.Boolean(MapToClipper1ClipType(boolType), polylinesA, polylinesB, pln, tolerance, EvenOdd);
+                    result = ClipperTools.Clipper1.Polyline3D.Boolean(boolType, polylinesA, polylinesB, pln, tolerance, EvenOdd);
                     break;
                 case ClipperVersion.Clipper2:
-                    result = ClipperTools.Clipper2.Polyline3D.Boolean(MapToClipper2ClipType(boolType), polylinesA, polylinesB, pln, tolerance, EvenOdd);
+                    result = ClipperTools.Clipper2.Polyline3D.Boolean(boolType, polylinesA, polylinesB, pln, tolerance, EvenOdd);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -84,36 +83,6 @@ public class ClipperBooleanComponent : BaseComponent
         }
     }
 
-    #region ClipType mapping
-
-    private static ClipType MapToClipper1ClipType(BooleanClipType type) => type switch
-    {
-        BooleanClipType.Intersection => ClipType.ctIntersection,
-        BooleanClipType.Union => ClipType.ctUnion,
-        BooleanClipType.Difference => ClipType.ctDifference,
-        BooleanClipType.Xor => ClipType.ctXor,
-        _ => throw new ArgumentOutOfRangeException(nameof(type))
-    };
-
-    private static Clipper2Lib.ClipType MapToClipper2ClipType(BooleanClipType type) => type switch
-    {
-        BooleanClipType.Intersection => Clipper2Lib.ClipType.Intersection,
-        BooleanClipType.Union => Clipper2Lib.ClipType.Union,
-        BooleanClipType.Difference => Clipper2Lib.ClipType.Difference,
-        BooleanClipType.Xor => Clipper2Lib.ClipType.Xor,
-        _ => throw new ArgumentOutOfRangeException(nameof(type))
-    };
-
-    #endregion
-
     protected override Bitmap Icon => Icons.Icon_CurveBoolean;
     public override Guid ComponentGuid => new Guid("80ab1de3-d9e2-4c5c-8dc8-9edd5ff30fc9");
-
-    public enum BooleanClipType
-    {
-        Intersection,
-        Union,
-        Difference,
-        Xor
-    }
 }
