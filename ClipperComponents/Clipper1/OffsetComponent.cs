@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using ClipperTools;
 using ClipperTools.Clipper1;
 using Grasshopper.Kernel;
 using Grasshopper.Kernel.Parameters;
@@ -13,14 +14,14 @@ namespace StudioAvw.Clipper.Components.Clipper1;
 /// <summary>
 /// Creates a CScriptComponent
 /// </summary>
-public class ClipperOffsetComponent : GH_Component
+public class OffsetComponent : BaseComponent
 {
     /// <summary>
     /// Initializes a new instance of the C# ScriptComponent class.
     /// </summary>
     /// <exclude />
-    public ClipperOffsetComponent()
-        : base("Polyline Offset", "PolyOffset", "Offset a polyline curve using Clipper", "Clipper", "Polyline")
+    public OffsetComponent()
+        : base("Polyline Offset", "PolyOffset", "Offset a polyline curve using Clipper")
     {
     }
 
@@ -40,12 +41,12 @@ public class ClipperOffsetComponent : GH_Component
         //public enum ClosedFilletType { Round, Square, Miter }
         var cfParamIndex = pManager.AddIntegerParameter("ClosedFillet", "CF", "Closed fillet type (0 = Round, 1 = Square, 2 = Miter)", GH_ParamAccess.list, new List<int> { 1 });
         var cfParam = pManager[cfParamIndex] as Param_Integer;
-        ParamHelper.AddEnumOptionsToParam<Polyline3D.ClosedFilletType>(cfParam);
+        ParamHelper.AddEnumOptionsToParam<GenericTools.ClosedFilletType>(cfParam);
             
         //public enum OpenFilletType { Round, Square, Butt }
         var ofParamIndex = pManager.AddIntegerParameter("OpenFillet", "OF", "Open fillet type (0 = Round, 1 = Square, 2 = Butt)", GH_ParamAccess.list, new List<int> { 1 });
         var ofParam = pManager[ofParamIndex] as Param_Integer;
-        ParamHelper.AddEnumOptionsToParam<Polyline3D.OpenFilletType>(ofParam);
+        ParamHelper.AddEnumOptionsToParam<GenericTools.OpenFilletType>(ofParam);
 
         pManager.AddNumberParameter("Miter", "M", "If closed fillet type of Miter is selected: the maximum extension of a curve is Distance * Miter", GH_ParamAccess.item, 2);
     }
@@ -71,29 +72,30 @@ public class ClipperOffsetComponent : GH_Component
         var dist = da.Fetch<double>("Distance");
         var pln = da.Fetch<Plane>("Plane");
         var tolerance = da.Fetch<double>("Tolerance");
-        var openType = da.FetchList<int>("OpenFillet").Cast<Polyline3D.OpenFilletType>().ToList();
+        var openType = da.FetchList<int>("OpenFillet").Cast<GenericTools.OpenFilletType>().ToList();
         if (openType.Count == 0)
         {
-            openType = new List<Polyline3D.OpenFilletType> { Polyline3D.OpenFilletType.Square };
+            openType = new List<GenericTools.OpenFilletType> { GenericTools.OpenFilletType.Square };
         }
         var miter = da.Fetch<double>("Miter");
-        var closedType = da.FetchList<int>("ClosedFillet").Cast<Polyline3D.ClosedFilletType>().ToList();
-        var polylines = Polyline3D.ConvertCurvesToPolyline(curves).ToList();
+        var closedType = da.FetchList<int>("ClosedFillet").Cast<GenericTools.ClosedFilletType>().ToList();
+        var polylines = GenericTools.ConvertCurvesToPolyline(curves).ToList();
 
         if (curves.Count == 0)
         {
             return;
         }
-
-        if (pln.Equals(default))
+        
+        if (!GenericTools.FitPlane(ref pln, polylines))
         {
-            pln = polylines.First().FitPlane();
+            da.SetDataList("Result", new List<Polyline>());
+            return;
         }
-
+        
         // set default fillet type.
         if (closedType.Count == 0)
         {
-            closedType = new List<Polyline3D.ClosedFilletType> { Polyline3D.ClosedFilletType.Square };
+            closedType = new List<GenericTools.ClosedFilletType> { GenericTools.ClosedFilletType.Square };
         }
 
         if (curves.Count == 0)
@@ -102,8 +104,7 @@ public class ClipperOffsetComponent : GH_Component
         }
 
         Polyline3D.Offset(polylines, openType, closedType, pln, tolerance, new List<double> { dist }, miter, 0.25, out var outside, out var holes);
-
-
+        
         // OUTPUT LOGIC
         da.SetDataList("Contour", outside.First());
         da.SetDataList("Holes", holes.First());

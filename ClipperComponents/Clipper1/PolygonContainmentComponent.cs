@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using ClipperTools;
 using ClipperTools.Clipper1;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
@@ -48,7 +49,7 @@ public class ClipperPolygonInsideComponent : GH_Component
     protected override void SolveInstance(IGH_DataAccess da)
     {
         // SET ALL INPUT PARAMETERS
-        if (!Polyline3D.ConvertCurveToPolyline(da.Fetch<Curve>("Polyline"), out var plA))
+        if (!GenericTools.ConvertCurveToPolyline(da.Fetch<Curve>("Polyline"), out var plA))
         {
             AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Unable to convert to polyline from curve");
             return;
@@ -59,7 +60,7 @@ public class ClipperPolygonInsideComponent : GH_Component
 
         if (pln.Equals(default))
         {
-            pln = plA.FitPlane();
+            pln = GenericTools.FitPlane(plA);
         }
 
         da.SetData("Inside", plA.IsInside(pt, pln, tolerance));

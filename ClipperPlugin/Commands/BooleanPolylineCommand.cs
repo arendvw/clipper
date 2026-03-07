@@ -3,6 +3,7 @@
 using System.Linq;
 using System.Runtime.InteropServices;
 using ClipperPlugin.Options;
+using ClipperTools;
 using ClipperTools.Clipper1;
 using Rhino;
 using Rhino.Commands;
@@ -61,8 +62,8 @@ namespace ClipperPlugin.Commands
             }
 
             // Convert curves to polylines. Perhaps this should have more control?
-            var curvesA = Polyline3D.ConvertCurvesToPolyline(objRefsA.Select(r => r.Curve()));
-            var curvesB = Polyline3D.ConvertCurvesToPolyline(getB.Objects().Select(r => r.Curve()));
+            var curvesA = GenericTools.ConvertCurvesToPolyline(objRefsA.Select(r => r.Curve()));
+            var curvesB = GenericTools.ConvertCurvesToPolyline(getB.Objects().Select(r => r.Curve()));
 
             if (_options == null)
             {

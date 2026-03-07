@@ -3,6 +3,7 @@
 using System.Linq;
 using System.Runtime.InteropServices;
 using ClipperPlugin.Options;
+using ClipperTools;
 using ClipperTools.Clipper1;
 using Rhino;
 using Rhino.Commands;
@@ -60,7 +61,7 @@ namespace ClipperPlugin.Commands
             }
 
             var curves = objRefs.Select(r => r.Curve());
-            var polylines = Polyline3D.ConvertCurvesToPolyline(curves).ToList();
+            var polylines = GenericTools.ConvertCurvesToPolyline(curves).ToList();
 
             if (_polylineOptions == null)
             {

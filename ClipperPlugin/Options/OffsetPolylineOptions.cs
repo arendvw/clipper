@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using ClipperPlugin.Commands;
+using ClipperTools;
 using ClipperTools.Clipper1;
 using Rhino;
 using Rhino.Geometry;
@@ -31,9 +32,9 @@ namespace ClipperPlugin.Options
 
         public bool HasDynamicPreview => _dynamicPreviewToggle.CurrentValue;
 
-        public Polyline3D.OpenFilletType OpenFillet => (Polyline3D.OpenFilletType)GetEnumValue("OpenFillet");
+        public GenericTools.OpenFilletType OpenFillet => (GenericTools.OpenFilletType)GetEnumValue("OpenFillet");
 
-        public Polyline3D.ClosedFilletType ClosedFillet => (Polyline3D.ClosedFilletType)GetEnumValue("ClosedFillet");
+        public GenericTools.ClosedFilletType ClosedFillet => (GenericTools.ClosedFilletType)GetEnumValue("ClosedFillet");
 
         public ProjectToCplane ProjectToCplane => (ProjectToCplane)GetEnumValue("ProjectTo");
 
@@ -56,8 +57,8 @@ namespace ClipperPlugin.Options
             AddOptionDouble("Distance", ref _offsetDistance, "Distance");
             AddOptionDouble("Tolerance", ref _tolerance, "Tolerance");
             AddOptionEnum("Side", Side.Both);
-            AddOptionEnum("OpenFillet", Polyline3D.OpenFilletType.Butt);
-            AddOptionEnum("ClosedFillet", Polyline3D.ClosedFilletType.Square);
+            AddOptionEnum("OpenFillet", GenericTools.OpenFilletType.Butt);
+            AddOptionEnum("ClosedFillet", GenericTools.ClosedFilletType.Square);
             AddOptionDouble("Miter", ref _miter, "Miter");
             AddOptionDouble("ArcTolerance", ref _arcTolerance, "ArcTolerance");
             AddOptionEnum("ProjectTo", ProjectToCplane.CPlane);
@@ -78,7 +79,7 @@ namespace ClipperPlugin.Options
             }
 
             var output = new List<Polyline>();
-            Polyline3D.Offset(_originalCurves, new List<Polyline3D.OpenFilletType> { OpenFillet }, new List<Polyline3D.ClosedFilletType> { ClosedFillet },
+            Polyline3D.Offset(_originalCurves, new List<GenericTools.OpenFilletType> { OpenFillet }, new List<GenericTools.ClosedFilletType> { ClosedFillet },
                 pln, Tolerance, new List<double> { OffsetDistance }, Miter, ArcTolerance,
                 out var contours, out var holes);
 

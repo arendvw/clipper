@@ -9,10 +9,10 @@ namespace StudioAvw.Clipper.Components.Clipper1;
 /// Base component that provides Clipper version and EvenOdd fill rule toggling
 /// via right-click menu, with serialization and undo support.
 /// </summary>
-public abstract class ClipperBaseComponent : GH_Component
+public abstract class BaseComponent : GH_Component
 {
-    protected ClipperBaseComponent(string name, string nickname, string description, string category, string subCategory)
-        : base(name, nickname, description, category, subCategory)
+    protected BaseComponent(string name, string nickname, string description)
+        : base(name, nickname, description, "Clipper", "Polyline")
     {
     }
 

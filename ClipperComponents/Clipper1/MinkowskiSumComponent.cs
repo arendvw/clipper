@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Linq;
+using ClipperTools;
 using ClipperTools.Clipper1;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
@@ -50,13 +51,13 @@ public class ClipperMinkowskiSumComponent : GH_Component
     protected override void SolveInstance(IGH_DataAccess da)
     {
         // SET ALL INPUT PARAMETERS
-        if (!Polyline3D.ConvertCurveToPolyline(da.Fetch<Curve>("A"), out var plA))
+        if (!GenericTools.ConvertCurveToPolyline(da.Fetch<Curve>("A"), out var plA))
         {
             AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Unable to convert to polyline from curve");
             return;
         }
 
-        if (!Polyline3D.ConvertCurveToPolyline(da.Fetch<Curve>("B"), out var plB))
+        if (!GenericTools.ConvertCurveToPolyline(da.Fetch<Curve>("B"), out var plB))
         {
             AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Unable to convert to polyline from curve");
             return;
@@ -66,7 +67,7 @@ public class ClipperMinkowskiSumComponent : GH_Component
         var tolerance = da.Fetch<double>("Tolerance");
         if (pln.Equals(default))
         {
-            pln = plA.FitPlane();
+            pln = GenericTools.FitPlane(plA);
         }
 
         var outCurves = ClipperTools.Clipper1.Clipper.MinkowskiSum(

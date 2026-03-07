@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using ClipperTools;
 using ClipperTools.Clipper1;
 using Grasshopper.Kernel;
 using Rhino.Geometry;
@@ -49,13 +50,13 @@ public class ClipperMinkowskiDiffComponent : GH_Component
     protected override void SolveInstance(IGH_DataAccess DA)
     {
         // SET ALL INPUT PARAMETERS
-        if (!Polyline3D.ConvertCurveToPolyline(DA.Fetch<Curve>("A"), out var plA))
+        if (!GenericTools.ConvertCurveToPolyline(DA.Fetch<Curve>("A"), out var plA))
         {
             AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Unable to convert to polyline from curve");
             return;
         }
 
-        if (!Polyline3D.ConvertCurveToPolyline(DA.Fetch<Curve>("B"), out var plB))
+        if (!GenericTools.ConvertCurveToPolyline(DA.Fetch<Curve>("B"), out var plB))
         {
             AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Unable to convert to polyline from curve");
             return;
@@ -65,7 +66,7 @@ public class ClipperMinkowskiDiffComponent : GH_Component
         var tolerance = DA.Fetch<double>("Tolerance");
         if (pln.Equals(default))
         {
-            pln = plA.FitPlane();
+            pln = GenericTools.FitPlane(plA);
         }
 
         var outCurves = new List<Polyline>();

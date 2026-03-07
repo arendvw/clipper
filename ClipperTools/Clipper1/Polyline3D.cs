@@ -12,88 +12,6 @@ namespace ClipperTools.Clipper1;
 /// </summary>
 public static class Polyline3D
 {
-    #region ClosedFilletType enum
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public enum ClosedFilletType
-    {
-        Round,
-        Square,
-        Miter
-    }
-
-    #endregion
-
-    #region OpenFilletType enum
-
-    /// <summary>
-    /// 
-    /// </summary>
-    public enum OpenFilletType
-    {
-        Round,
-        Square,
-        Butt
-    }
-
-    #endregion
-
-    /// <summary>
-    /// Get a plane from a polyline
-    /// </summary>
-    /// <param name="crv">The CRV.</param>
-    /// <returns></returns>
-    public static Plane FitPlane(this Polyline crv)
-    {
-        Plane.FitPlaneToPoints(crv, out var pln);
-        return pln;
-    }
-
-    /// <summary>
-    /// Converts the curves to polyline.
-    /// </summary>
-    /// <param name="crvs">The CRVS.</param>
-    /// <returns></returns>
-    public static IEnumerable<Polyline> ConvertCurvesToPolyline(IEnumerable<Curve> crvs)
-    {
-        foreach (var c in crvs)
-        {
-            if (ConvertCurveToPolyline(c, out var pl))
-            {
-                yield return pl;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Converts the curve to polyline.
-    /// </summary>
-    /// <param name="c">The c.</param>
-    /// <param name="pl">The pl.</param>
-    /// <returns></returns>
-    public static bool ConvertCurveToPolyline(Curve c, out Polyline pl)
-    {
-        if (c.TryGetPolyline(out pl))
-        {
-            return pl.IsValid && !(pl.Length < RhinoMath.ZeroTolerance);
-        }
-        // default options.. should perhaps do something with the document tolerance.
-        var polylineCurve = c.ToPolyline(0, 0, 0.1, 0, 0, 0, 0, 0, true);
-        if (polylineCurve == null)
-        {
-            //Component.AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Unable to convert brep edge to polyline");
-            return false;
-        }
-        if (!polylineCurve.TryGetPolyline(out pl))
-        {
-            //Component.AddRuntimeMessage(GH_RuntimeMessageLevel.Warning, "Unable to convert brep edge to polyline - weird shizzle");
-            return false;
-        }
-        return pl.IsValid && !(pl.Length < RhinoMath.ZeroTolerance);
-    }
-
     /// <summary>
     ///   Offset a polyline with a distance.
     /// </summary>
@@ -119,11 +37,11 @@ public static class Polyline3D
     {
         // ReSharper disable once PossibleMultipleEnumeration
         var pl = polylines.First();
-        Plane pln = pl.FitPlane();
+        Plane pln = GenericTools.FitPlane(pl);
 
         //
         // ReSharper disable once PossibleMultipleEnumeration
-        Offset(polylines, OpenFilletType.Butt, ClosedFilletType.Square, distance, pln,
+        Offset(polylines, GenericTools.OpenFilletType.Butt, GenericTools.ClosedFilletType.Square, distance, pln,
             RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, out outContour, out outHole);
     }
 
@@ -138,11 +56,11 @@ public static class Polyline3D
     /// <param name="tolerance">The tolerance.</param>
     /// <param name="outContour">The out contour.</param>
     /// <param name="outHole">The out hole.</param>
-    public static void Offset(IEnumerable<Polyline> polylines, OpenFilletType openFilletType,
-        ClosedFilletType closedFilletType, double distance, Plane plane, double tolerance, out List<Polyline> outContour,
+    public static void Offset(IEnumerable<Polyline> polylines, GenericTools.OpenFilletType openFilletType,
+        GenericTools.ClosedFilletType closedFilletType, double distance, Plane plane, double tolerance, out List<Polyline> outContour,
         out List<Polyline> outHole)
     {
-        Offset(polylines, new List<OpenFilletType> { openFilletType }, new List<ClosedFilletType> { closedFilletType }, plane,
+        Offset(polylines, new List<GenericTools.OpenFilletType> { openFilletType }, new List<GenericTools.ClosedFilletType> { closedFilletType }, plane,
             tolerance, new List<double> { distance }, 2, 0.25, out var outContours, out var outHoles);
         outContour = outContours[0];
         outHole = outHoles[0];
@@ -176,8 +94,8 @@ public static class Polyline3D
     /// <param name="arcTolerance">The arc tolerance.</param>
     /// <param name="outContour">The out contour.</param>
     /// <param name="outHoles">The out holes.</param>
-    public static void Offset(IEnumerable<Polyline> polylines, List<OpenFilletType> openFilletType,
-        List<ClosedFilletType> closedFilltetType, Plane plane, double tolerance, IEnumerable<double> distance,
+    public static void Offset(IEnumerable<Polyline> polylines, List<GenericTools.OpenFilletType> openFilletType,
+        List<GenericTools.ClosedFilletType> closedFilltetType, Plane plane, double tolerance, IEnumerable<double> distance,
         double miter, double arcTolerance, out List<List<Polyline>> outContour, out List<List<Polyline>> outHoles)
     {
         outContour = new List<List<Polyline>>();
@@ -215,13 +133,13 @@ public static class Polyline3D
                 var oft = IndexOrLast(openFilletType, i);
                 switch (oft)
                 {
-                    case OpenFilletType.Butt:
+                    case GenericTools.OpenFilletType.Butt:
                         et = EndType.etOpenButt;
                         break;
-                    case OpenFilletType.Round:
+                    case GenericTools.OpenFilletType.Round:
                         et = EndType.etOpenRound;
                         break;
-                    case OpenFilletType.Square:
+                    case GenericTools.OpenFilletType.Square:
                         et = EndType.etOpenSquare;
                         break;
                 }
@@ -236,13 +154,13 @@ public static class Polyline3D
                 var cft = IndexOrLast(closedFilltetType, i);
                 switch (cft)
                 {
-                    case ClosedFilletType.Miter:
+                    case GenericTools.ClosedFilletType.Miter:
                         jt = JoinType.jtMiter;
                         break;
-                    case ClosedFilletType.Round:
+                    case GenericTools.ClosedFilletType.Round:
                         jt = JoinType.jtRound;
                         break;
-                    case ClosedFilletType.Square:
+                    case GenericTools.ClosedFilletType.Square:
                         jt = JoinType.jtSquare;
                         break;
                 }
