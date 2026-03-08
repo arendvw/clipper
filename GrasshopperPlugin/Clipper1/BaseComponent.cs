@@ -92,7 +92,7 @@ public abstract class BaseComponent : GH_Component
         var v2Item = Menu_AppendItem(menu, "Clipper 2", Menu_Clipper2Clicked, true, Version == ClipperVersion.Clipper2);
         v2Item.ToolTipText = @"Use Clipper2 library.";
 
-        AppendAdditionalMenuItems(menu);
+        AppendComponentMenuItems(menu);
     }
 
     /// <summary>

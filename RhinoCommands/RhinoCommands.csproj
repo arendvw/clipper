@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFrameworks>net48;net8.0-windows</TargetFrameworks>
     <RootNamespace>ClipperPlugin</RootNamespace>
     <TargetExt>.rhp</TargetExt>
     <UseWindowsForms>true</UseWindowsForms>
@@ -16,6 +16,35 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Common\Common.csproj" />
+    <ProjectReference Include="..\GrasshopperPlugin\GrasshopperPlugin.csproj" />
   </ItemGroup>
+  <Target Name="GenerateLaunchSettings" AfterTargets="Build">
+    <PropertyGroup>
+      <_BaseDir>$(MSBuildProjectDirectory)\bin\$(Configuration)\</_BaseDir>
+      <_BaseDirEscaped>$(_BaseDir.Replace('\', '\\'))</_BaseDirEscaped>
+      <_Template>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)\Properties\launchSettings.template.json'))</_Template>
+      <_Template>$(_Template.Replace('${RHINO_PACKAGE_BASE}', '$(_BaseDirEscaped)'))</_Template>
+    </PropertyGroup>
+    <WriteLinesToFile File="$(MSBuildProjectDirectory)\Properties\launchSettings.json" Lines="$(_Template)" Overwrite="true" />
+  </Target>
+  <Target Name="BuildYakPackage" AfterTargets="DispatchToInnerBuilds">
+    <PropertyGroup>
+      <YakExecutable
+              Condition="$(YakExecutable) == '' and $([MSBuild]::IsOSPlatform(windows)) and Exists('C:\Program Files\Rhino 8\System\Yak.exe')">C:\Program Files\Rhino 8\System\Yak.exe</YakExecutable>
+      <YakExecutable
+              Condition="$(YakExecutable) == '' and $([MSBuild]::IsOSPlatform(macos)) and Exists('/Applications/Rhino 8.app/Contents/Resources/bin/yak')">/Applications/Rhino 8.app/Contents/Resources/bin/yak</YakExecutable>
 
+      <BuildYakPackage Condition="$(BuildYakPackage) == '' and $(YakExecutable) != '' and Exists($(YakExecutable))">True</BuildYakPackage>
+    </PropertyGroup>
+    <Warning Text="Could not find Yak executable" Condition="$(YakExecutable) == ''" />
+    <ItemGroup>
+      <YakPackagesToDelete Include="$(OutputPath)\*.yak;$(OutputPath)\**\manifest.yml" />
+    </ItemGroup>
+    <Warning Text="Writing yak package to $(OutputPath) $(BuildYakPackage)" />
+    <Delete Files="@(YakPackagesToDelete)" />
+    <Exec Command="&quot;$(YakExecutable)&quot; spec" WorkingDirectory="$(OutputPath)"
+          Condition="$(BuildYakPackage) == 'True'" />
+    <Exec Command="&quot;$(YakExecutable)&quot; build" WorkingDirectory="$(OutputPath)"
+          Condition="$(BuildYakPackage) == 'True'" />
+  </Target>
 </Project>

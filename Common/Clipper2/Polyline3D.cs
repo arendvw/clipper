@@ -420,4 +420,9 @@ public static class Polyline3D
         mesh.Compact();
         return mesh;
     }
+
+    public static void Test2()
+    {
+
+    }
 }

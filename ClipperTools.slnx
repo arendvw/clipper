@@ -1,6 +1,5 @@
 <Solution>
   <Project Path="Common/Common.csproj" />
   <Project Path="GrasshopperPlugin/GrasshopperPlugin.csproj" />
-  <Project Path="RhinoBundle/RhinoBundle.csproj" />
   <Project Path="RhinoCommands/RhinoCommands.csproj" />
 </Solution>

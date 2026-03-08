@@ -1,8 +1,0 @@
----
-name: Clipper
-authors:
-- Arend van Waart
-description: Reliable offsets for Rhino and Grasshopper
-url: https://github.com/arendvw/ScriptParasite
-secret:
-  id: 43334b3c-4a74-7648-6ecd-38dfdf4ec67f
