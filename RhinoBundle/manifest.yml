@@ -1,9 +1,8 @@
 ---
 name: Clipper
-version: 0.3.3
 authors:
 - Arend van Waart
-description: Clipper offers reliable polygon offsets and boolean operations for Rhino and Grasshopper
+description: Reliable offsets for Rhino and Grasshopper
 url: https://github.com/arendvw/ScriptParasite
 secret:
   id: 43334b3c-4a74-7648-6ecd-38dfdf4ec67f

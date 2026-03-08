@@ -3,10 +3,10 @@
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <RootNamespace>StudioAvw.Clipper.Components</RootNamespace>
-    <AssemblyName>ClipperComponents</AssemblyName>
     <TargetExt>.gha</TargetExt>
     <UseWindowsForms>true</UseWindowsForms>
     <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+    <PackageId>GrasshopperPlugin</PackageId>
 
   </PropertyGroup>
 
@@ -17,11 +17,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ClipperTools\ClipperTools.csproj" />
+    <ProjectReference Include="..\Common\Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Components\" />
   </ItemGroup>
-
 </Project>

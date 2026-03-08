@@ -388,4 +388,36 @@ public static class Polyline3D
             polyline.IsClosed);
         return simplified.First().ToPolyline(pln, tolerance, polyline.IsClosed);
     }
+    
+    public static Mesh Triangulate(List<Polyline> polylines, Plane pln, double tolerance, Clipper2Lib.FillRule fillRule)
+    {
+        var paths = new Clipper2Lib.Paths64();
+        foreach (var pl in polylines)
+        {
+            paths.Add(pl.ToPath2D(pln, tolerance));
+        }
+
+        // union first to resolve self-intersections and apply fill rule
+        var cleaned = Clipper2Lib.Clipper.Union(paths, fillRule);
+
+        var result = Clipper2Lib.Clipper.Triangulate(cleaned, out var triangles);
+        if (result != Clipper2Lib.TriangulateResult.success)
+            throw new Exception($"Triangulation failed: {result}");
+
+        var mesh = new Mesh();
+        foreach (var tri in triangles)
+        {
+            if (tri.Count != 3) continue;
+            var baseIndex = mesh.Vertices.Count;
+            foreach (var pt in tri)
+            {
+                mesh.Vertices.Add(pln.PointAt(pt.X * tolerance, pt.Y * tolerance));
+            }
+            mesh.Faces.AddFace(baseIndex, baseIndex + 1, baseIndex + 2);
+        }
+
+        mesh.Normals.ComputeNormals();
+        mesh.Compact();
+        return mesh;
+    }
 }

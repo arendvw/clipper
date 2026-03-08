@@ -1,5 +1,6 @@
 <Solution>
-  <Project Path="ClipperComponents/ClipperComponents.csproj" />
-  <Project Path="ClipperPlugin/ClipperPlugin.csproj" />
-  <Project Path="ClipperTools/ClipperTools.csproj" />
+  <Project Path="Common/Common.csproj" />
+  <Project Path="GrasshopperPlugin/GrasshopperPlugin.csproj" />
+  <Project Path="RhinoBundle/RhinoBundle.csproj" />
+  <Project Path="RhinoCommands/RhinoCommands.csproj" />
 </Solution>

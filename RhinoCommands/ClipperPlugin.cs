@@ -15,7 +15,7 @@ namespace ClipperPlugin {
       Instance = this;
     }
 
-    ///<summary>Gets the only instance of the ClipperPlugin plug-in.</summary>
+    ///<summary>Gets the only instance of the RhinoCommands plug-in.</summary>
     public static ClipperPlugin Instance {
       get;
       private set;
